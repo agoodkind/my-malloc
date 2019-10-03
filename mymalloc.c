@@ -51,6 +51,26 @@ void* mymalloc (size_t size) {
 void combineFreeBlocks(byte* heap) {
   /*traverse the block of memory and locating the adjacent free blocks, combining their
   sizes along the way*/
+    int i;
+  node* currentNode = (node*)myblock;
+  node* nextNode = NULL;
+  int accumulator = 0;
+  for(i=0; i<nodeCount; i++)
+  {
+    if(currentNode->inUse==0)
+    {
+      nextNode = currentNode->next;
+      if(nextNode->inUse==0)
+      {
+        accumulator+=nextNode->blockSize;
+        continue;
+      }
+    }
+    //currentNode = (node*)currentNode;
+    currentNode->blockSize += accumulator;
+    currentNode = nextNode;
+    accumulator = 0;
+  }
 }
 
 void myfree (void* address) {
