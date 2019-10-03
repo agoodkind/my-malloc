@@ -17,7 +17,7 @@ void* mymalloc (size_t size, char* file, int line) {
     
     if (heapUninitialized) {
         /**
-        get top of heap ready to accept allocations
+        get the top of heap ready to accept allocations
         */
         
         node* head = ((node*)myblock[0]);
