@@ -13,6 +13,7 @@
 void* mymalloc (size_t size) {
     
   if (size + globalSize + (nodeCount * sizeof(node*)) > HEAPSIZE) {
+      printf("Error asking for more memory than available\n");
     return NULL;
   }
     
