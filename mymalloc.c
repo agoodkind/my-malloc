@@ -12,41 +12,20 @@
 
 void* mymalloc (size_t size) {
     
-  if (size + globalSize + (nodeCount * sizeof(node*)) > HEAPSIZE) {
-      printf("Error asking for more memory than available\n");
-    return NULL;
-  }
+    node* currentBlock = (node*)myblock;
     
-    node* currentPos = (node*)myblock;
-    
-    while (currentPos->next != NULL) {
-        if (!currentPos->inUse) {
-            
-        } else {
-            currentPos = currentPos->next;
+    // case 1: the first block is NULL, which means our entire list is free
+    if (currentBlock != NULL) {
+        while (currentBlock->next != NULL) {
+            if (currentBlock->inUse) {
+                currentBlock = currentBlock->next;
+            } else {
+                break;
+            }
         }
-        
     }
-    
-  int i;
-    
-  for (i = 0; i < nodeCount; i++) {
-      
-    if (((node*)currentPos)->inUse == false && ((node*)currentPos)->blockSize >= size) {
-        node* temp;
-        
-        return currentPos;
-    }
-      
-    currentPos += ((node*)currentPos)->blockSize + sizeof(node*) + 1;
-      
-  }
-    
-  if (i >= nodeCount) {
-    return NULL;
-  }
 
- return 0;
+    return splitBlock(currentBlock, size);;
 }
 
 void combineFreeBlocks()
@@ -79,8 +58,6 @@ void combineFreeBlocks()
   }
 }
 
-
-
 void myfree (void* address) {
   char* currentPos = myblock;
   int i;
@@ -107,4 +84,41 @@ void myfree (void* address) {
     currentPos = ((node*)currentPos)->next;
   }
 
+}
+
+void* splitBlock (node* block, size_t size) {
+    
+    size_t sizeNeeded = sizeof(node*) + size + 1;
+    void* userPointer;
+    
+    if (block->blockSize >= sizeNeeded) {
+        
+        // this block is now in use, mark this in our node
+        block->inUse = true;
+        block->blockSize = size;
+        
+        // we need a new block
+        (block + size + 1)->next = block->next;
+        block->next = (block + size + 1);
+        
+        size_t newBlockSize = 0;
+        
+        // case 1: block has exactly enough space for a new block of memory + requested size + 1
+        if (block->blockSize == sizeNeeded) {
+            newBlockSize = 1;
+            
+        // case 2: block has enough space for a new block of memory + requested size + n
+        } else if (block->blockSize > sizeNeeded) {
+            newBlockSize = block->blockSize - sizeNeeded;
+        }
+        
+        block->next->blockSize = newBlockSize;
+        
+        userPointer = (void*)(block + 1);
+        
+    } else {
+        userPointer = NULL;
+    }
+    
+    return userPointer;
 }
