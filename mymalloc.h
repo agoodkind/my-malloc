@@ -14,7 +14,7 @@ typedef unsigned long size_t;
 typedef struct _node {
     int inUse;
     size_t blockSize;
-    struct node* next;
+    struct _node* next;
 } node;
 
 typedef enum _bool {
@@ -25,13 +25,12 @@ typedef enum _bool {
 typedef char byte;
 
 static const int HEAPSIZE = 4096;
-static int nodeCount = 0;
-static int globalSize = 0;
 static byte myblock[HEAPSIZE];
 
 void* mymalloc(size_t);
-void myfree(void *);
+void myfree(void*);
 void combineFreeBlocks();
+void* splitBlock(node*, size_t);
 
 
 
