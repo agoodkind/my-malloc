@@ -6,8 +6,12 @@
 //  Due: 10/15/2019
 //
 
-#ifndef _mymalloc_h
-#define _mymalloc_h
+#ifndef _MYMALLOC_H
+#define _MYMALLOC_H
+
+
+#define malloc( x ) mymalloc( ( x ) , __FILE__, __LINE__ )
+#define free( x ) myfree( ( x ) , __FILE__ , __LINE__ )
 
 typedef unsigned long size_t;
 
@@ -24,15 +28,17 @@ typedef enum _bool {
 
 typedef char byte;
 
+static bool heapUninitialized = true;
+
 static const int HEAPSIZE = 4096;
 static byte myblock[HEAPSIZE];
 
-void* mymalloc(size_t);
-void myfree(void*);
-void combineFreeBlocks();
-void* splitBlock(node*, size_t);
+void* mymalloc (size_t, char*, int);
+void myfree (void*, char*, int);
+void combineFreeBlocks (void);
+void* splitBlock (node*, size_t);
+void initializeHeap (void);
 
 
 
-
-#endif /* _mymalloc_h */
+#endif /* _MYMALLOC_H */

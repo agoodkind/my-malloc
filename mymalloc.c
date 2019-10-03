@@ -1,16 +1,31 @@
 //
-//  mymalloc.c - main program
+//  mymalloc.c - library program
 //  Rutgers CS 01:198:214 Systems Programming
 //  Professor John-Austen Francisco
 //  Authors: Anthony Siluk & Alexander Goodkind
 //  Due: 10/15/2019
 //
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
+
 #include "mymalloc.h"
 
-void* mymalloc (size_t size) {
+
+void* mymalloc (size_t size, char* file, int line) {
+    
+    if (heapUninitialized) {
+        /**
+        get top of heap ready to accept allocations
+        */
+        
+        node* head = ((node*)myblock[0]);
+        head->blockSize = 4096 - (sizeof(node*)) - 1;
+        head->inUse = false;
+        
+        heapUninitialized = false;
+    }
     
     node* currentBlock = (node*)myblock;
     size_t sizeNeeded = sizeof(node*) + size + 1;
@@ -30,9 +45,10 @@ void* mymalloc (size_t size) {
 
 void combineFreeBlocks()
 {
-  /*traverse the block of memory and locating the adjacent free blocks, combining their
-  sizes along the way*/
-  int i;
+  /**
+   traverse the block of memory and locating the adjacent free blocks, combining their
+  sizes along the way
+   */
   node* currentNode = (node*)myblock;
   node* nextNode = NULL;
   int accumulator = 0;
@@ -51,16 +67,15 @@ void combineFreeBlocks()
         continue;
       }
     }
-    //currentNode = (node*)currentNode;
+    // currentNode = (node*)currentNode;
     currentNode->blockSize += accumulator;
     currentNode = nextNode;
     accumulator = 0;
   }
 }
 
-void myfree (void* address) {
+void myfree (void* address, char* file, int line) {
   char* currentPos = myblock;
-  int i;
   if(currentPos==NULL)
   {
     printf("Error no memory has yet been allocated\n");
@@ -119,3 +134,6 @@ void* splitBlock (node* block, size_t size) {
     
     return userPointer;
 }
+
+
+
