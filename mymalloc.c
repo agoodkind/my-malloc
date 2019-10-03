@@ -82,6 +82,11 @@ void myfree (void* address) {
       
     if (currentPos + sizeof(node*) + 1 == address) {
         
+      if(((node*)currentPos)->inUse==0)
+      {
+        printf("Error specified address was already freed\n");
+        return;
+      }
       ((node*)currentPos)->inUse = 0;
       combineFreeBlocks(myblock);
         
