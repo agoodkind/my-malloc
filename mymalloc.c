@@ -17,15 +17,19 @@ void* mymalloc (size_t size) {
     // case 1: the first block is NULL, which means our entire list is free
     if (currentBlock != NULL) {
         while (currentBlock->next != NULL) {
-            if (currentBlock->inUse) {
-                currentBlock = currentBlock->next;
-            } else {
-                break;
+
+            if (currentBlock->blockSize >= size + sizeof(node*) + 1) {
+              return splitBlock(currentBlock, size);
             }
+
+            currentBlock = currentBlock->next;
         }
+
+        // print error out of mem
     }
 
-    return splitBlock(currentBlock, size);;
+    return NULL;
+
 }
 
 void combineFreeBlocks()
