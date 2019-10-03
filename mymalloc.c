@@ -8,28 +8,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "mymalloc.h"
-
-int sizeOfHeap = 4096;
-int nodeCount = 0;
-int globalSize = 0;
-
-int main(int argc, const char * argv[]) {
-
-    node test;
-    test.inUse = 1;
-    test.blockSize = 10;
-
-    printf("%s", "hello!\n");
-
-    return 0;
-}
-
 
 void* mymalloc (size_t size) {
     
-  if(size + globalSize + (nodeCount * 8)>sizeOfHeap) {
+  if(size + globalSize + (nodeCount * sizeof(node)) > HEAPSIZE) {
     return NULL;
   }
     

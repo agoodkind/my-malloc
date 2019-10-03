@@ -19,7 +19,10 @@ typedef struct _node {
 
 typedef char byte;
 
-static byte myblock[4096];
+static const int HEAPSIZE = 4096;
+static int nodeCount = 0;
+static int globalSize = 0;
+static byte myblock[HEAPSIZE];
 
 void* mymalloc(size_t);
 void myfree(void *);
