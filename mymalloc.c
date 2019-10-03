@@ -12,7 +12,7 @@
 
 void* mymalloc (size_t size) {
     
-  if(size + globalSize + (nodeCount * sizeof(node)) > HEAPSIZE) {
+  if (size + globalSize + (nodeCount * sizeof(node*)) > HEAPSIZE) {
     return NULL;
   }
     
@@ -34,8 +34,7 @@ void* mymalloc (size_t size) {
     return NULL;
   }
 
-    return 0;
-
+ return 0;
 }
 
 void combineFreeBlocks(byte* heap) {
@@ -49,7 +48,7 @@ void myfree (void* address) {
     
   for(i = 0; i < nodeCount; i++) {
       
-    if (currentPos+sizeof(node*)+1 == address) {
+    if (currentPos+sizeof(node*) + 1 == address) {
         
       ((node*)currentPos)->inUse = 0;
       combineFreeBlocks(myblock);
