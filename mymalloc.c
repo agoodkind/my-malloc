@@ -77,25 +77,27 @@ void combineFreeBlocks(byte* heap) {
 void myfree (void* address) {
   char* currentPos = myblock;
   int i;
-    
-  for(i = 0; i < nodeCount; i++) {
-      
-    if (currentPos + sizeof(node*) + 1 == address) {
-        
+  if(currentPos==NULL)
+  {
+    printf("Error no memory has yet been allocated\n");
+    return;
+  }
+  while(currentPos!=NULL)
+  {
+    if(((node*)currentPos)->next==address)
+    {
       if(((node*)currentPos)->inUse==0)
       {
         printf("Error specified address was already freed\n");
         return;
       }
       ((node*)currentPos)->inUse = 0;
-      combineFreeBlocks(myblock);
-        
+      combineFreeBlocks();
       return;
-
+      //break;
     }
-      
-    currentPos += ((node*)currentPos)->blockSize + sizeof(node*)+1;
-      
+    //currentPos += ((node*)currentPos)->blockSize + sizeof(node*)+1;
+    currentPos = ((node*)currentPos)->next;
   }
-    
+
 }
