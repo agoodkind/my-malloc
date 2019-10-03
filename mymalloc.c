@@ -24,35 +24,38 @@ int main(int argc, const char * argv[]) {
     printf("%s", "hello!\n");
 
     return 0;
-
 }
 
 
 void* mymalloc (size_t size) {
-  if(size + globalSize + (nodeCount * 8)>sizeOfHeap)
-  {
+    
+  if(size + globalSize + (nodeCount * 8)>sizeOfHeap) {
     return NULL;
   }
+    
   char *currentPos = myblock;
+    
   int i;
-  for(i = 0; i<nodeCount; i++)
-  {
-    if(((node*)currentPos)->inUse==0&&((node*)currentPos)->blockSize>=size)
-    {
+    
+  for (i = 0; i<nodeCount; i++) {
+      
+    if (((node*)currentPos)->inUse == 0 && ((node*)currentPos)->blockSize >= size) {
       return currentPos;
     }
-    currentPos += ((node*)currentPos)->blockSize + sizeof(node*)+1;
+      
+    currentPos += ((node*)currentPos)->blockSize + sizeof(node*) + 1;
+      
   }
-  if(i>=nodeCount)
-  {
+    
+  if (i >= nodeCount) {
     return NULL;
   }
 
     return 0;
 
 }
-void combineFreeBlocks(byte* heap)
-{
+
+void combineFreeBlocks(byte* heap) {
   /*traverse the block of memory and locating the adjacent free blocks, combining their
   sizes along the way*/
 }
@@ -60,16 +63,20 @@ void combineFreeBlocks(byte* heap)
 void myfree (void* address) {
   char* currentPos = myblock;
   int i;
-  for(i = 0; i<nodeCount; i++)
-  {
-    if(currentPos+sizeof(node*)+1==address)
-    {
+    
+  for(i = 0; i < nodeCount; i++) {
+      
+    if (currentPos+sizeof(node*)+1 == address) {
+        
       ((node*)currentPos)->inUse = 0;
       combineFreeBlocks(myblock);
+        
       return;
-      //break;
-    }
-    currentPos += ((node*)currentPos)->blockSize + sizeof(node*)+1;
-  }
 
+    }
+      
+    currentPos += ((node*)currentPos)->blockSize + sizeof(node*)+1;
+      
+  }
+    
 }
