@@ -14,7 +14,7 @@ typedef unsigned long size_t;
 typedef struct _node {
     int inUse;
     size_t blockSize;
-    struct node* next;
+    node* next;
 } node;
 
 typedef enum _bool {
