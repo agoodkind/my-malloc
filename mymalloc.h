@@ -36,8 +36,5 @@ void* mymalloc (size_t, char*, int);
 void myfree (void*, char*, int);
 void combineFreeBlocks (void);
 void* splitBlock (node*, size_t);
-void initializeHeap (void);
-
-
 
 #endif /* _MYMALLOC_H */
