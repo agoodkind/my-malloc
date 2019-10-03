@@ -31,7 +31,7 @@ static byte myblock[HEAPSIZE];
 
 void* mymalloc(size_t);
 void myfree(void *);
-void combineFreeBlocks(byte*);
+void combineFreeBlocks();
 
 
 
