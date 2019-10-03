@@ -57,10 +57,10 @@ void combineFreeBlocks(byte* heap) {
   int accumulator = 0;
   for(i=0; i<nodeCount; i++)
   {
-    if(currentNode->inUse==0)
+    if(currentNode->inUse==false)
     {
       nextNode = currentNode->next;
-      if(nextNode->inUse==0)
+      if(nextNode->inUse==false)
       {
         accumulator+=nextNode->blockSize;
         continue;
