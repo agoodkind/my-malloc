@@ -16,14 +16,25 @@ void* mymalloc (size_t size) {
     return NULL;
   }
     
-  char *currentPos = myblock;
+    node* currentPos = (node*)myblock;
+    
+    while (currentPos->next != NULL) {
+        if (!currentPos->inUse) {
+            
+        } else {
+            currentPos = currentPos->next;
+        }
+        
+    }
     
   int i;
     
-  for (i = 0; i<nodeCount; i++) {
+  for (i = 0; i < nodeCount; i++) {
       
-    if (((node*)currentPos)->inUse == 0 && ((node*)currentPos)->blockSize >= size) {
-      return currentPos;
+    if (((node*)currentPos)->inUse == false && ((node*)currentPos)->blockSize >= size) {
+        node* temp;
+        
+        return currentPos;
     }
       
     currentPos += ((node*)currentPos)->blockSize + sizeof(node*) + 1;
@@ -48,7 +59,7 @@ void myfree (void* address) {
     
   for(i = 0; i < nodeCount; i++) {
       
-    if (currentPos+sizeof(node*) + 1 == address) {
+    if (currentPos + sizeof(node*) + 1 == address) {
         
       ((node*)currentPos)->inUse = 0;
       combineFreeBlocks(myblock);
