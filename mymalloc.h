@@ -1,11 +1,13 @@
 //
-//  mymalloc.h
-//  project1-systems-214
-//
+//  mymalloc.h - main program header
+//  Rutgers CS 01:198:214 Systems Programming
+//  Professor John-Austen Francisco
+//  Authors: Anthony Siluk & Alexander Goodkind
+//  Due: 10/15/2019
 //
 
-#ifndef mymalloc_h
-#define mymalloc_h
+#ifndef _mymalloc_h
+#define _mymalloc_h
 
 typedef unsigned long size_t;
 
@@ -26,4 +28,4 @@ void combineFreeBlocks(byte*);
 
 
 
-#endif /* mymalloc_h */
+#endif /* _mymalloc_h */

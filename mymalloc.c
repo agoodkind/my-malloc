@@ -1,14 +1,16 @@
 //
-//  main.c
-//  project1-systems-214
-//
-//  Created by Alexander Goodkind on 10/1/19.
-//  Copyright © 2019 Alex Goodkind. All rights reserved.
+//  mymalloc.c - main program
+//  Rutgers CS 01:198:214 Systems Programming
+//  Professor John-Austen Francisco
+//  Authors: Anthony Siluk & Alexander Goodkind
+//  Due: 10/15/2019
 //
 
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "mymalloc.h"
+
 int sizeOfHeap = 4096;
 int nodeCount = 0;
 int globalSize = 0;
@@ -19,18 +21,7 @@ int main(int argc, const char * argv[]) {
     test.inUse = 1;
     test.blockSize = 10;
 
-    // myblock[0] = test;
-
-//    ((MemNode*)(ptr))->inUse = 1;
-
-    void* mallocTest = (void*)calloc(1, 10);
-
-
-
-
     printf("%s", "hello!\n");
-
-    // free(mallocTest);
 
     return 0;
 
