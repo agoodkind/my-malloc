@@ -28,6 +28,13 @@ int main(int argc, const char * argv[]) {
     int* testIntArraySeven = (int*)malloc(7*sizeof(int));
     
     printf("test\n");
+ 
+ int i;
+ for(i=0;i<151; i++)
+  {
+    char* a = (char*)mymalloc(sizeof(char*));
+    myfree((void*)a);
+  }
 
     return 0;
 }
