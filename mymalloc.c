@@ -20,7 +20,7 @@ void* mymalloc (size_t size, char* file, int line) {
         get the top of heap ready to accept allocations
         */
         
-        node* head = ((node*)myblock[0]);
+        node* head = ((node*)myblock);
         head->blockSize = 4096 - (sizeof(node*)) - 1;
         head->inUse = false;
         
