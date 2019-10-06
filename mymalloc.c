@@ -14,6 +14,16 @@
 
 bool heapUninitialized = true;
 
+#if DEBUG
+void debug() {
+    
+}
+#endif
+
+/**
+ TODO: add bound checking
+ */
+
 void* mymalloc (size_t size, char* file, int line) {
     
     if (heapUninitialized == true) {
