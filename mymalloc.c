@@ -103,9 +103,9 @@ void myfree (void* address, char* file, int line) {
       ((node*)currentPos)->inUse = 0;
       combineFreeBlocks();
       return;
-      //break;
+
     }
-    //currentPos += ((node*)currentPos)->blockSize + sizeof(node*)+1;
+
     currentPos = getNext(currentPos);
   }
 
