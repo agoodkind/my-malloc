@@ -29,6 +29,7 @@ void* mymalloc (size_t size, char* file, int line) {
     if (heapUninitialized == true) {
         /**
         get the top of heap ready to accept allocations
+         we set the very beginning of the heap to true
         */
         
         ((node*)&myblock[0])->inUse = false;
@@ -79,7 +80,9 @@ void combineFreeBlocks() {
 }
 
 /**
- TODO:
+ TODO: add checking for pointer input
+ we must assert that &myblock[0] <= (char*) address <= &myblock[HEAP_SIZE]
+ or error out
  */
 void myfree (void* address, char* file, int line) {
   char* currentPos = myblock;
@@ -123,7 +126,7 @@ char* findOpenBlock(size_t size) {
           return current;
       }
 
-        current = current + ((node*)current)->blockSize + sizeof(node*) + 1;
+        current = getNext(current);
     }
     
     return NULL;
@@ -133,8 +136,14 @@ char* findOpenBlock(size_t size) {
  */
 char* getNext(char* current) {
     
+    // get the max_heap (the pointer of the very last index of the heap
+    
     char* max_heap = &myblock[HEAP_SIZE];
     char* next = current + ((node*)current)->blockSize + sizeof(node*) + 1;
+    
+    
+    // using pointer arithmetic compare the next node with the last pointer of the heap
+    // we cant return anything past the end of the heap so we return NULL
     
     if (next >= max_heap) {
         return NULL;
