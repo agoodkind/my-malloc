@@ -22,17 +22,28 @@
 int main(int argc, const char * argv[]) {
 
 #if DEBUG
-    
+
     //printf("%X", (unsigned int)((node*)myblock)->next);
 
     char* testCharArrayFive = (char*)malloc(5*sizeof(char));
-    
-    int* testIntArraySeven = (int*)malloc(7*sizeof(int));
-    
-    printf("test\n");
-    
-#endif
 
+    int* testIntArraySeven = (int*)malloc(7*sizeof(int));
+
+    printf("test\n");
+
+
+#endif
+char* character = (char*)malloc(sizeof(char));
+*character = 'A';
+printf("this is character = %c\n",*character);
+free(character);
+printf("this is character = %c\n",*character);
+
+/*int i;
+for(i = 0; i<151; i++)
+{
+
+}*/
 
     return 0;
 }
