@@ -20,10 +20,12 @@ void debug(void);
 
 /**
  we use this node struct as the metadata
+ char inUse: 't' = true
+ 'f' = false
  */
 typedef struct _node {
-    int inUse;
     size_t blockSize;
+    char inUse;
 } node;
 
 /**
