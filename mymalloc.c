@@ -130,10 +130,18 @@ char* findOpenBlock(size_t size) {
 }
 /**
  get the next node, this is the current pointer + blockSize + sizeof(node*) + 1
- TODO: add bound checking
  */
 char* getNext(char* current) {
-    return current + ((node*)current)->blockSize + sizeof(node*) + 1;
+    
+    char* max_heap = &myblock[HEAP_SIZE];
+    char* next = current + ((node*)current)->blockSize + sizeof(node*) + 1;
+    
+    if (next >= max_heap) {
+        return NULL;
+    } else {
+        return next;
+    }
+    
 }
 
 /**
