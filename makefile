@@ -1,11 +1,12 @@
-all: memgrind.c mymalloc.o
-	gcc  memgrind.c mymalloc.o
+all: mymalloc.o memgrind.c
+	gcc mymalloc.o memgrind.c
 
 mymalloc.o: mymalloc.c
-	gcc -c mymalloc.c -o mymalloc.o
+	gcc -o mymalloc.o -c mymalloc.c 
 	
 clean:
-	rm a.out; rm mymalloc.o; rm debug_mymalloc
+	rm -f a.out; rm -f mymalloc.o; rm -f debug_mymalloc
 	
-debug: mymalloc.c
-	gcc -D DEBUG=1 mymalloc.c -o debug_mymalloc
+debug:
+	gcc -D DEBUG=1 -g -Wall -o debug_mymalloc.o -c mymalloc.c
+	gcc -D DEBUG=1 -g -Wall -o debug_mymalloc debug_mymalloc.o memgrind.c

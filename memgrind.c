@@ -6,28 +6,32 @@
 //  Due: 10/15/2019
 //
 
-/**
- debugger directive
- */
-#define DEBUG 0
-
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
-#include "memgrind.h"
+#include <assert.h>
+#include <sys/types.h>
+#include <time.h>
+#include <sys/time.h>
+#include <errno.h>
+
 #include "mymalloc.h"
+#include "memgrind.h"
 
 int main(int argc, const char * argv[]) {
 
-    node test;
-    test.inUse = 1;
-    test.blockSize = 10;
+#if DEBUG
+    
+    //printf("%X", (unsigned int)((node*)myblock)->next);
 
     char* testCharArrayFive = (char*)malloc(5*sizeof(char));
     
     int* testIntArraySeven = (int*)malloc(7*sizeof(int));
     
     printf("test\n");
+    
+#endif
 
 
     return 0;

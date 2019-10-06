@@ -12,61 +12,56 @@
 
 #include "mymalloc.h"
 
+bool heapUninitialized = true;
 
 void* mymalloc (size_t size, char* file, int line) {
     
-    if (heapUninitialized) {
+    if (heapUninitialized == true) {
         /**
         get the top of heap ready to accept allocations
         */
         
-        node* head = ((node*)myblock);
-        head->blockSize = 4096 - (sizeof(node*)) - 1;
-        head->inUse = false;
+        ((node*)&myblock[0])->inUse = false;
+        ((node*)&myblock[0])->blockSize = 4096 - (sizeof(node*)) - 1;
         
         heapUninitialized = false;
     }
     
-    node* currentBlock = (node*)myblock;
-    size_t sizeNeeded = sizeof(node*) + size + 1;
-
-    while (currentBlock != NULL) {
-      if (currentBlock->blockSize >= sizeNeeded) {
-        return splitBlock(currentBlock, size);
-      }
-
-      currentBlock = currentBlock->next;
+    char* openNode = findOpenNode(size);
+    
+    if (openNode == NULL) {
+        return NULL;
+    } else {
+        return splitBlock(openNode, size);
     }
-
-    // print error out of mem
-
-    return NULL;
+   
 }
 
-void combineFreeBlocks()
-{
-  /**
-   traverse the block of memory and locating the adjacent free blocks, combining their
-  sizes along the way
-   */
+/**
+ traverse the block of memory and locating the adjacent free blocks, combining their
+sizes along the way
+ */
+void combineFreeBlocks() {
   node* currentNode = (node*)myblock;
   node* nextNode = NULL;
   int accumulator = 0;
-  if(currentNode==NULL)
-  {
+    
+  if(currentNode == NULL) {
     return;
   }
+    
   while(currentNode!=NULL)
   {
     if(currentNode->inUse==0)
     {
-      nextNode = currentNode->next;
+      nextNode = getNext(currentNode);
       if(nextNode->inUse==0)
       {
         accumulator+=nextNode->blockSize;
         continue;
       }
     }
+      
     // currentNode = (node*)currentNode;
     currentNode->blockSize += accumulator;
     currentNode = nextNode;
@@ -74,6 +69,9 @@ void combineFreeBlocks()
   }
 }
 
+/**
+ TODO:
+ */
 void myfree (void* address, char* file, int line) {
   char* currentPos = myblock;
   if(currentPos==NULL)
@@ -83,7 +81,7 @@ void myfree (void* address, char* file, int line) {
   }
   while(currentPos!=NULL)
   {
-    if(((node*)currentPos)->next==address)
+    if(getNext(currentPos) == address)
     {
       if(((node*)currentPos)->inUse==0)
       {
@@ -96,43 +94,63 @@ void myfree (void* address, char* file, int line) {
       //break;
     }
     //currentPos += ((node*)currentPos)->blockSize + sizeof(node*)+1;
-    currentPos = ((node*)currentPos)->next;
+    currentPos = getNext(currentPos);
   }
 
 }
 
 /**
-this function only gets called if a block was found with enough space
-*/
-void* splitBlock (node* block, size_t size) {
-    
+ this function starts at the beginning of the array and looks for a free space that contains enought to hold the combination of:
+ the metadata, the user requested size, and 1 additional byte
+ */
+
+char* findOpenBlock(size_t size) {
+    char* current = &myblock[0];
     size_t sizeNeeded = sizeof(node*) + size + 1;
-    void* userPointer;
-        
-    // this block is now in use, mark this in our node
-    block->inUse = true;
-    block->blockSize = size;
-    
-    // we need a new block
-    (block + size + 1)->next = block->next;
-    block->next = (block + size + 1);
-    
-    size_t newBlockSize = 0;
-    
-    // case 1: block has exactly enough space for a new block of memory + requested size + 1
-    if (block->blockSize == sizeNeeded) {
-        newBlockSize = 1;
-        
-    // case 2: block has enough space for a new block of memory + requested size + n
-    } else if (block->blockSize > sizeNeeded) {
-        newBlockSize = block->blockSize - sizeNeeded;
+
+    while (current != NULL) {
+      if (!((node*)current)->inUse &&
+          ((node*)current)->blockSize >= sizeNeeded) {
+          return current;
+      }
+
+        current = current + ((node*)current)->blockSize + sizeof(node*) + 1;
     }
     
-    block->next->blockSize = newBlockSize;
+    return NULL;
+}
+/**
+ get the next node, this is the current pointer + blockSize + sizeof(node*) + 1
+ TODO: add bound checking
+ */
+char* getNext(char* current) {
+    return current + ((node*)current)->blockSize + sizeof(node*) + 1;
+}
+
+/**
+this function only gets called if a block was found with enough space
+ we take the block that was found to have a enough space and allocated space on it (set inUse = true)
+ we then designate an unused block directly adjacent to the end (of the size + header) of the given block
+*/
+void* splitBlock (char* current, size_t size) {
     
-    userPointer = (void*)(block + 1);
+    size_t sizeNeeded = sizeof(node*) + size + 1;
+    size_t freeBlockSize = ((node*)current)->blockSize;
+    size_t newBlockSize = freeBlockSize - sizeNeeded;
+        
+    // this block is now in use, mark this in our node
+    ((node*)current)->inUse = true;
+    ((node*)current)->blockSize = size;
     
-    return userPointer;
+    // we need a new node that starts adjacent to the current block
+    char* newNode = current + sizeNeeded;
+    
+    // set block size & inUse flag
+    ((node*)newNode)->blockSize = newBlockSize;
+    ((node*)newNode)->inUse = false;
+
+    // return a void pointer to basePtr + the size of a node pointer + 1 stay consistent with malloc's implementation
+    return (void*)(current + sizeof(node*) + 1);
 }
 
 

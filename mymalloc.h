@@ -12,12 +12,17 @@
 #define malloc( x ) mymalloc( ( x ) , __FILE__, __LINE__ )
 #define free( x ) myfree( ( x ) , __FILE__ , __LINE__ )
 
+#define HEAP_SIZE 4096
+
+#if DEBUG
+void debug(void);
+#endif
+
 typedef unsigned long size_t;
 
 typedef struct _node {
     int inUse;
     size_t blockSize;
-    struct _node* next;
 } node;
 
 typedef enum _bool {
@@ -25,16 +30,14 @@ typedef enum _bool {
     false = 0
 } bool;
 
-typedef char byte;
+static char myblock[HEAP_SIZE];
 
-static bool heapUninitialized = true;
-
-static const int HEAPSIZE = 4096;
-static byte myblock[HEAPSIZE];
-
+char* findOpenBlock (size_t);
 void* mymalloc (size_t, char*, int);
 void myfree (void*, char*, int);
 void combineFreeBlocks (void);
-void* splitBlock (node*, size_t);
+void* splitBlock (char*, size_t);
+char* getNext(char*);
+
 
 #endif /* _MYMALLOC_H */
