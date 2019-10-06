@@ -42,8 +42,8 @@ void* mymalloc (size_t size, char* file, int line) {
 sizes along the way
  */
 void combineFreeBlocks() {
-  node* currentNode = (node*)myblock;
-  node* nextNode = NULL;
+  char* currentNode = myblock;
+  char* nextNode = NULL;
   int accumulator = 0;
     
   if(currentNode == NULL) {
@@ -52,18 +52,17 @@ void combineFreeBlocks() {
     
   while(currentNode!=NULL)
   {
-    if(currentNode->inUse==0)
+    if(((node*)currentNode)->inUse==0)
     {
       nextNode = getNext(currentNode);
-      if(nextNode->inUse==0)
+      if(((node*)currentNode)->inUse==0)
       {
-        accumulator+=nextNode->blockSize;
+        accumulator += ((node*)currentNode)->blockSize;
         continue;
       }
     }
       
-    // currentNode = (node*)currentNode;
-    currentNode->blockSize += accumulator;
+    ((node*)currentNode)->blockSize += accumulator;
     currentNode = nextNode;
     accumulator = 0;
   }
