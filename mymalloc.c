@@ -37,7 +37,7 @@ void* mymalloc (size_t size, char* file, int line) {
         heapUninitialized = false;
     }
     
-    char* openNode = findOpenNode(size);
+    char* openNode = findOpenBlock(size);
     
     if (openNode == NULL) {
         return NULL;
