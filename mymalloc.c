@@ -110,7 +110,7 @@ char * findOpenNode(size_t size) {
     char *current = &myblock[0];
     size_t sizeNeeded = sizeof(node *) + size + 1;
 
-    while (current != NULL) {
+    while (current < &myblock[4096]) {
         if (!((node *)current)->inUse &&
             ((node *)current)->blockSize >= sizeNeeded) {
             return current;
