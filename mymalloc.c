@@ -31,7 +31,7 @@ void * mymalloc(size_t size, char *file, int line) {
          we set the very beginning of the heap to true
         */
 
-        ((node *)&myblock[0])->inUse = false;
+        ((node *)&myblock[0])->inUse = 'f';
         ((node *)&myblock[0])->blockSize = 4096 - (sizeof(node *)) - 1;
 
         heapUninitialized = false;
@@ -57,10 +57,10 @@ void combineFreeBlocks() {
 
     while (currentNode < &myblock[4096]) {
         
-        if (((node *)currentNode)->inUse == false) {
+        if (((node *)currentNode)->inUse == 'f') {
             nextNode = getNext(currentNode);
             
-            if (((node *)nextNode)->inUse == false) {
+            if (((node *)nextNode)->inUse == 'f') {
                 ((node *)currentNode)->blockSize += ((node *)getNext(currentNode))->blockSize;
                 nextNode = getNext(nextNode);
             } else {
@@ -81,11 +81,11 @@ void myfree(void *address, char *file, int line) {
 
     while (currentPos < &myblock[4096]) {
         if (currentPos == userAddress) {
-            if (((node *)currentPos)->inUse == 0) {
+            if (((node *)currentPos)->inUse == 'f') {
                 printf("%s:%d Error specified address was already freed\n", file, line);
                 return;
             }
-            ((node *)currentPos)->inUse = 0;
+            ((node *)currentPos)->inUse = 'f';
             combineFreeBlocks();
             return;
         }
@@ -106,7 +106,7 @@ char * findOpenNode(size_t size) {
     size_t sizeNeeded = sizeof(node *) + size + 1;
 
     while (current < &myblock[4096]) {
-        if (!((node *)current)->inUse &&
+        if (((node *)current)->inUse == 'f' &&
             ((node *)current)->blockSize >= sizeNeeded) {
             return current;
         }
@@ -138,7 +138,7 @@ char * getNext(char *current) {
 
 /**
 this function only gets called if a block was found with enough space
- we take the block that was found to have a enough space and allocated space on it (set inUse = true)
+ we take the block that was found to have a enough space and allocated space on it (set inUse = 't')
  we then designate an unused block directly adjacent to the end (of the size + header) of the given block
 */
 void * splitBlock(char *current, size_t size) {
@@ -147,7 +147,7 @@ void * splitBlock(char *current, size_t size) {
     size_t newBlockSize = freeBlockSize - sizeNeeded;
 
     // this block is now in use, mark this in our node
-    ((node *)current)->inUse = true;
+    ((node *)current)->inUse = 't';
     ((node *)current)->blockSize = size;
 
     // we need a new node that starts adjacent to the current block
@@ -155,7 +155,7 @@ void * splitBlock(char *current, size_t size) {
 
     // set block size & inUse flag
     ((node *)newNode)->blockSize = newBlockSize;
-    ((node *)newNode)->inUse = false;
+    ((node *)newNode)->inUse = 'f';
 
     // return a void pointer to basePtr + the size of a node pointer + 1 stay consistent with malloc's implementation
     return (void *)(current + sizeof(node *) + 1);
