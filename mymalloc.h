@@ -37,7 +37,7 @@ typedef enum _bool {
 
 static char myblock[HEAP_SIZE];
 
-char* findOpenBlock (size_t);
+char* findOpenNode (size_t);
 void* mymalloc (size_t, char*, int);
 void myfree (void*, char*, int);
 void combineFreeBlocks (void);
