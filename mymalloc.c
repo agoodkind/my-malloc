@@ -38,7 +38,7 @@ void* mymalloc (size_t size, char* file, int line) {
         heapUninitialized = false;
     }
     
-    char* openNode = findOpenBlock(size);
+    char* openNode = findOpenNode(size);
     
     if (openNode == NULL) {
         return NULL;
@@ -116,7 +116,7 @@ void myfree (void* address, char* file, int line) {
  the metadata, the user requested size, and 1 additional byte
  */
 
-char* findOpenBlock(size_t size) {
+char* findOpenNode(size_t size) {
     char* current = &myblock[0];
     size_t sizeNeeded = sizeof(node*) + size + 1;
 
