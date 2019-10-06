@@ -18,16 +18,21 @@
 void debug(void);
 #endif
 
-typedef unsigned long size_t;
-
+/**
+ we use this node struct as the metadata
+ */
 typedef struct _node {
     int inUse;
     size_t blockSize;
 } node;
 
+/**
+ boolean is just false = 0, and true != 0 (1)
+ for readibility sake
+ */
 typedef enum _bool {
-    true = 1,
-    false = 0
+    false = 0,
+    true = 1
 } bool;
 
 static char myblock[HEAP_SIZE];
