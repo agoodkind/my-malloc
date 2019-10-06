@@ -40,7 +40,7 @@ void * mymalloc(size_t size, char *file, int line) {
     char *openNode = findOpenNode(size);
 
     if (openNode == NULL) {
-      printf("%s%d: Error not enough memory\n", file,line);
+        printf("%s%d: Error not enough memory\n", file, line);
         return NULL;
     } else {
         return splitBlock(openNode, size);
@@ -54,19 +54,19 @@ sizes along the way
 void combineFreeBlocks() {
     char *currentNode = &myblock[0];
     char *nextNode = NULL;
-    int accumulator = 0;
 
-    while ((node*)(currentNode)->inUse != true) {
-      ((node *)currentNode)->blockSize += accumulator;
-        //if (((node *)currentNode)->inUse == false) {
+    while (currentNode < &myblock[4096]) {
+        
+        if (((node *)currentNode)->inUse == false) {
             nextNode = getNext(currentNode);
+            
             if (((node *)nextNode)->inUse == false) {
-                accumulator += ((node *)currentNode)->blockSize;
-                currentNode = nextNode;
+                ((node *)currentNode)->blockSize += ((node *)getNext(currentNode))->blockSize;
+                nextNode = getNext(nextNode);
+            } else {
+                currentNode = getNext(currentNode);
             }
-        //}
-
-        accumulator = 0;
+        }
     }
 }
 
@@ -77,12 +77,12 @@ void combineFreeBlocks() {
  */
 void myfree(void *address, char *file, int line) {
     char *currentPos = &myblock[0];
-    char *userAddress =  (char*)(address - sizeof(node*)-1);
+    char *userAddress =  (char *)(address - sizeof(node *) - 1);
 
     while (currentPos < &myblock[4096]) {
         if (currentPos == userAddress) {
             if (((node *)currentPos)->inUse == 0) {
-                printf("%s:%d Error specified address was already freed\n",file,line);
+                printf("%s:%d Error specified address was already freed\n", file, line);
                 return;
             }
             ((node *)currentPos)->inUse = 0;
@@ -92,7 +92,7 @@ void myfree(void *address, char *file, int line) {
 
         currentPos = getNext(currentPos);
     }
-    printf("%s:%d Error no memory has yet been allocated\n",file,line);
+    printf("%s:%d Error no memory has yet been allocated\n", file, line);
     return;
 }
 
