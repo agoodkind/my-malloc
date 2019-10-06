@@ -40,6 +40,7 @@ void * mymalloc(size_t size, char *file, int line) {
     char *openNode = findOpenNode(size);
 
     if (openNode == NULL) {
+      printf("%s%d: Error not enough memory\n", file,line);
         return NULL;
     } else {
         return splitBlock(openNode, size);
@@ -80,15 +81,13 @@ void combineFreeBlocks() {
  or error out
  */
 void myfree(void *address, char *file, int line) {
-    char *currentPos = myblock;
-    if (currentPos == NULL) {
-        printf("Error no memory has yet been allocated\n");
-        return;
-    }
-    while (currentPos != NULL) {
-        if (getNext(currentPos) == address) {
+    char *currentPos = &myblock[0];
+    char *userAddress =  (char*)(address - sizeof(node*)-1);
+
+    while (currentPos < &myblock[4096]) {
+        if (currentPos == userAddress) {
             if (((node *)currentPos)->inUse == 0) {
-                printf("Error specified address was already freed\n");
+                printf("%s:%d Error specified address was already freed\n",file,line);
                 return;
             }
             ((node *)currentPos)->inUse = 0;
@@ -98,6 +97,8 @@ void myfree(void *address, char *file, int line) {
 
         currentPos = getNext(currentPos);
     }
+    printf("%s:%d Error no memory has yet been allocated\n",file,line);
+    return;
 }
 
 /**
