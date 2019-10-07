@@ -52,19 +52,33 @@ void * mymalloc(size_t size, char *file, int line) {
 sizes along the way
  */
 void combineFreeBlocks() {
+    size_t newSize = 0;
     char *currentNode = &myblock[0];
     char *nextNode = NULL;
-
-    while (currentNode < &myblock[4096]) {
+    
+    // scan entire heap until we reach the end (or hit NULL for some edge case)
+    while (currentNode < &myblock[4096] && currentNode != NULL) {
         if (!isInUse(((node *)currentNode))){
             nextNode = getNext(currentNode);
+            
+            // reached the end of the memory heap
+            if (nextNode >= &myblock[4096] || nextNode == NULL) {
+                return;
+            }
+            
+            // add up the blockSize of the nextNode + the size of the metadata
+            newSize += sizeof(node*) + ((node*)nextNode)->blockSize + 1;
 
             if (!isInUse(((node *)nextNode))) {
-                ((node *)currentNode)->blockSize += ((node *)getNext(currentNode))->blockSize;
+                ((node *)currentNode)->blockSize += newSize;
+                newSize = 0;
                 nextNode = getNext(nextNode);
             } else {
                 currentNode = getNext(currentNode);
             }
+        } else {
+            
+            currentNode = getNext(currentNode);
         }
     }
 }
@@ -123,6 +137,7 @@ char * getNext(char *current) {
     // get the max_heap (the pointer of the very last index of the heap
 
     char *max_heap = &myblock[HEAP_SIZE];
+    
     char *next = current + ((node *)current)->blockSize + sizeof(node *) + 1;
 
     // using pointer arithmetic compare the next node with the last pointer of the heap

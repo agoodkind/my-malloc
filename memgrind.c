@@ -26,7 +26,12 @@ int main(int argc, const char *argv[]) {
 
     char *testCharArrayFive = (char *)malloc(5 * sizeof(char));
 
-    testCharArrayFive = "hell";
+    testCharArrayFive[0] = 'h';
+    testCharArrayFive[1] = 'e';
+    testCharArrayFive[2] = 'l';
+    testCharArrayFive[3] = 'l';
+    testCharArrayFive[4] = '\0';
+    
 
     int *testIntArraySeven = (int *)malloc(7 * sizeof(int));
 
