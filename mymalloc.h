@@ -45,6 +45,8 @@ void myfree (void*, char*, int);
 void combineFreeBlocks (void);
 void* splitBlock (char*, size_t);
 char* getNext(char*);
-
+bool isInUse(node*);
+char inUseBoolToChar(bool);
+bool inUseCharToBool(char);
 
 #endif /* _MYMALLOC_H */
