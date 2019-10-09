@@ -25,6 +25,12 @@ void debug() {
  */
 
 void * mymalloc(size_t size, char *file, int line) {
+    
+    if (size > 4096-sizeof(node*)) {
+        printf("%s%d: Error not enough memory\n", file, line);
+        return NULL;
+    }
+    
     if (heapUninitialized == true) {
         /**
         get the top of heap ready to accept allocations
