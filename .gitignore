@@ -3,5 +3,9 @@ Icon
 *.a
 *.o
 *.dSYM
-Icon
-Icon
+Icon
+
+Icon
+
+Icon\r
+Icon^M

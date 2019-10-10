@@ -168,7 +168,7 @@ int main(int argc, const char *argv[]) {
                 }
             } else {
                 if (partDAllocated > 0) {
-                    free(partD[partDAllocated--]);
+                    free(partD[--partDAllocated]);
                 }
             }
             
