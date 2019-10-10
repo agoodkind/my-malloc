@@ -56,6 +56,15 @@ int main(int argc, const char *argv[]) {
     free(character);
     printf("this is character = %c\n", *character);
     
+    struct timespec testStart, testEnd;
+    
+    clock_gettime(CLOCK_MONOTONIC, &testStart);   
+    sleep(1);
+    clock_gettime(CLOCK_MONOTONIC, &testEnd);
+    
+    
+    printf("%ld, %ld, %ld\n", testStart.tv_sec, testEnd.tv_sec, testEnd.tv_sec - testStart.tv_sec);
+    
 #endif
     
     int workload;
