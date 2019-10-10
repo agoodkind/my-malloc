@@ -82,16 +82,20 @@ int main(int argc, const char *argv[]) {
         printf("Part B.) Malloc 1 byte, store the pointer in an array, 150 times.\nAfter 50 times, free 50 1 by 1.\n");
         int b;
         void* partB[50];
-        for (b = 0; b < 50; b++) {
-            partB[b] = malloc(1);
-            if (b == 49) {
+        int partBCounter = 0;
+        for (b = 0; b < 150; b++) {
+            partB[partBCounter++] = malloc(1);
+            if (partBCounter == 50) {
                 int b2;
                 for (b2 = 0; b2 < 50; b2++) {
                     free(partB[b2]);
+                    partB[b2] = NULL;
                 }
-                b = 0;
+                partBCounter = 0;
             }
         }
+        
+        
         printf("Done Part B.)\n");
         
         // get random number seeded based on time
@@ -125,7 +129,7 @@ int main(int argc, const char *argv[]) {
             } else {
                 // check to make sure that there is at least 1 allocated
                 if (partCAllocated > 0) {
-                    free(partC[partCAllocated--]);
+                    free(partC[--partCAllocated]);
                 }
             }
         }

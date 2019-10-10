@@ -12,6 +12,8 @@
 
 #include "mymalloc.h"
 
+static char myblock[HEAP_SIZE];
+
 bool heapUninitialized = true;
 
 #if DEBUG

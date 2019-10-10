@@ -37,8 +37,6 @@ typedef enum _bool {
     true = 1
 } bool;
 
-static char myblock[HEAP_SIZE];
-
 char* findOpenNode (size_t);
 void* mymalloc (size_t, char*, int);
 void myfree (void*, char*, int);
