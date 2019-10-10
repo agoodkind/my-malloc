@@ -142,6 +142,8 @@ int main(int argc, const char *argv[]) {
             free(partC[c]);
         }
         
+        printf("Done Part C.)\n");
+        
         /**
          part D.)
          Randomly choose between a randomly-sized malloc() or free()ing a pointer – do this many times (see below)
@@ -150,6 +152,8 @@ int main(int argc, const char *argv[]) {
          - Choose a random allocation size between 1 and 64 bytes
          
          */
+        
+        printf("Part D.) Randomly choose between a randomly-sized malloc() or free()ing a pointer.\n");
         
         void* partD[50];
         
@@ -182,6 +186,8 @@ int main(int argc, const char *argv[]) {
             free(partD[d]);
         }
         
+        printf("Done Part D.)\n");
+        
         /**
          part E.)
          
@@ -193,7 +199,7 @@ int main(int argc, const char *argv[]) {
          */
 
 
-        printf("Done Part C.)\n");
+    
     }
     
     return 0;
