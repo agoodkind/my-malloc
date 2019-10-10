@@ -24,7 +24,7 @@ void debug(void);
  'f' = false
  */
 typedef struct _node {
-    size_t blockSize;
+    unsigned short blockSize;
     char inUse;
 } node;
 
