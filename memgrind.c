@@ -78,18 +78,25 @@ int main(int argc, const char *argv[]) {
          part B.)
          malloc() 1 byte, store the pointer in an array - do this 150 times.
          Once you've malloc()ed 50 byte chunks, then free() the 50 1 byte pointers one by one.
-         TODO: what do we do with bytes 50-149
          */
         printf("Part B.) Malloc 1 byte, store the pointer in an array, 150 times.\nAfter 50 times, free 50 1 by 1.\n");
         int b;
-        void* partB[150];
-        for (b = 0; b < 150; b++) {
+        void* partB[50];
+        for (b = 0; b < 50; b++) {
             partB[b] = malloc(1);
-            if (b >= 50 && b < 100) {
-                free(partB[b-50]);
+            if (b == 49) {
+                int b2;
+                for (b2 = 0; b2 < 50; b2++) {
+                    free(partB[b2]);
+                }
+                b = 0;
             }
         }
         printf("Done Part B.)\n");
+        
+        // get random number seeded based on time
+        // only do this once for the entire program
+        srand((unsigned)time(0));
         
         /**
          part C.)
@@ -99,11 +106,37 @@ int main(int argc, const char *argv[]) {
          iteration
          - Keep track of each operation so that you eventually free() all pointers
          > don't allow a free() if you have no pointers to free()
-         TODO: random byte
          */
         printf("Part C.) Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer until 50 bytes have been allocated.\n");
-        int numAllocated = 0;
-        int numFreed = 0;
+        
+        int partCAllocated = 0;
+        int partCCount = 0;
+        
+        void* partC[50];
+        
+        // rand() % 2 can equal 0 or 1 randomly
+        // if 1 then allocate 1
+        // if 0 then free 1
+        
+        while (partCCount < 50) {
+            if (rand() % 2) {
+                partC[partCAllocated++] = malloc(1);
+                partCCount++;
+            } else {
+                // check to make sure that there is at least 1 allocated
+                if (partCAllocated > 0) {
+                    free(partC[partCAllocated--]);
+                }
+            }
+        }
+        
+        // then free rest
+        
+        int c;
+        
+        for (c = 0; c < partCAllocated; c++) {
+            free(partC[c]);
+        }
         
         /**
          part D.)
@@ -113,6 +146,37 @@ int main(int argc, const char *argv[]) {
          - Choose a random allocation size between 1 and 64 bytes
          
          */
+        
+        void* partD[50];
+        
+        int partDAllocated = 0;
+        int partDCount = 0;
+        
+        while (partDCount < 50) {
+            
+            if (rand() % 2) {
+                // rand() % 64 + 1
+                // generate a random number between 1 and 64
+                void* temp = malloc(rand() % 64 + 1);
+                if (temp != NULL) {
+                    partD[partDAllocated++] = temp;
+                    partDCount++;
+                }
+            } else {
+                if (partDAllocated > 0) {
+                    free(partD[partDAllocated--]);
+                }
+            }
+            
+        }
+        
+        // then free rest
+        
+        int d;
+        
+        for (d = 0; d < partDAllocated; d++) {
+            free(partD[d]);
+        }
         
         /**
          part E.)
