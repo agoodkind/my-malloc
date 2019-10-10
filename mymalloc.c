@@ -28,7 +28,7 @@ void debug() {
 
 void * mymalloc(size_t size, char *file, int line) {
     
-    if (size > 4096-sizeof(node*)) {
+    if (size > 4096-sizeof(node)) {
         printf("%s%d: Error not enough memory\n", file, line);
         return NULL;
     }
@@ -40,7 +40,7 @@ void * mymalloc(size_t size, char *file, int line) {
         */
 
         ((node *)&myblock[0])->inUse = inUseBoolToChar(false);
-        ((node *)&myblock[0])->blockSize = 4096 - (sizeof(node *)) - 1;
+        ((node *)&myblock[0])->blockSize = 4096 - (sizeof(node)) - 1;
 
         heapUninitialized = false;
     }
@@ -75,7 +75,7 @@ void combineFreeBlocks() {
             }
             
             // add up the blockSize of the nextNode + the size of the metadata
-            newSize += sizeof(node*) + ((node*)nextNode)->blockSize + 1;
+            newSize += sizeof(node) + ((node*)nextNode)->blockSize + 1;
 
             if (!isInUse(((node *)nextNode))) {
                 ((node *)currentNode)->blockSize += newSize;
@@ -98,7 +98,7 @@ void combineFreeBlocks() {
  */
 void myfree(void *address, char *file, int line) {
     char *currentPos = &myblock[0];
-    char *userAddress =  (char *)(address - sizeof(node *) - 1);
+    char *userAddress =  (char *)(address - sizeof(node) - 1);
 
     while (currentPos < &myblock[4096]) {
         if (currentPos == userAddress) {
@@ -124,7 +124,7 @@ void myfree(void *address, char *file, int line) {
 
 char * findOpenNode(size_t size) {
     char *current = &myblock[0];
-    size_t sizeNeeded = sizeof(node *) + size + 1;
+    size_t sizeNeeded = sizeof(node) + size + 1;
 
     while (current < &myblock[4096]) {
         if (!isInUse(((node *)current)) &&
@@ -139,14 +139,14 @@ char * findOpenNode(size_t size) {
 }
 
 /**
- get the next node, this is the current pointer + blockSize + sizeof(node*) + 1
+ get the next node, this is the current pointer + blockSize + sizeof(node) + 1
  */
 char * getNext(char *current) {
     // get the max_heap (the pointer of the very last index of the heap
 
     char *max_heap = &myblock[HEAP_SIZE];
     
-    char *next = current + ((node *)current)->blockSize + sizeof(node *) + 1;
+    char *next = current + ((node *)current)->blockSize + sizeof(node) + 1;
 
     // using pointer arithmetic compare the next node with the last pointer of the heap
     // we cant return anything past the end of the heap so we return NULL
@@ -164,7 +164,7 @@ this function only gets called if a block was found with enough space
  we then designate an unused block directly adjacent to the end (of the size + header) of the given block
 */
 void * splitBlock(char *current, size_t size) {
-    size_t sizeNeeded = sizeof(node *) + size + 1;
+    size_t sizeNeeded = sizeof(node) + size + 1;
     size_t freeBlockSize = ((node *)current)->blockSize;
     size_t newBlockSize = freeBlockSize - sizeNeeded;
 
@@ -180,7 +180,7 @@ void * splitBlock(char *current, size_t size) {
     ((node *)newNode)->inUse = inUseBoolToChar(false);
 
     // return a void pointer to basePtr + the size of a node pointer + 1 stay consistent with malloc's implementation
-    return (void *)(current + sizeof(node *) + 1);
+    return (void *)(current + sizeof(node) + 1);
 }
 
 /**

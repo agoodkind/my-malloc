@@ -59,7 +59,7 @@ int main(int argc, const char *argv[]) {
 #endif
     
     int workload;
-    for (workload = 0; workload < 150; workload++) {
+    for (workload = 0; workload < 100; workload++) {
         printf("Running workload #%d: \n", workload + 1);
         
         /**
