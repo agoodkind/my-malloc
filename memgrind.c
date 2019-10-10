@@ -17,7 +17,15 @@
 #include <errno.h>
 
 #include "mymalloc.h"
-#include "memgrind.h"
+
+double averageTime(unsigned long long times[]) {
+    int i;
+    double sumOfTimes = 0;
+    for (i = 0; i < 100; i++) {
+        sumOfTimes += times[i];
+    }
+    return (double)sumOfTimes / 100.0;
+}
 
 int main(int argc, const char *argv[]) {
 #if DEBUG
@@ -55,34 +63,44 @@ int main(int argc, const char *argv[]) {
     printf("this is character = %c\n", *character);
     free(character);
     printf("this is character = %c\n", *character);
-    
+
     struct timespec testStart, testEnd;
-    
-    clock_gettime(CLOCK_MONOTONIC, &testStart);   
+
+    clock_gettime(CLOCK_MONOTONIC, &testStart);
     sleep(1);
     clock_gettime(CLOCK_MONOTONIC, &testEnd);
-    
-    
+
     printf("%ld, %ld, %ld\n", testStart.tv_sec, testEnd.tv_sec, testEnd.tv_sec - testStart.tv_sec);
-    
+
 #endif
-    
+
     int workload;
+    unsigned long long timesA[100];
+    unsigned long long timesB[100];
+    unsigned long long timesC[100];
+    unsigned long long timesD[100];
+    unsigned long long currentTime;
+    struct timespec start, end;
+    //int time;
     for (workload = 0; workload < 100; workload++) {
         printf("Running workload #%d: \n", workload + 1);
-        
+
         /**
          part A.)
          malloc() 1 byte and immediately free it - do this 150 times
          */
         printf("Part A.) Malloc and freeing 1 byte, 150 times.\n");
         int a;
+        clock_gettime(CLOCK_MONOTONIC, &start);
         for (a = 0; a < 150; a++) {
-            void* ptr = malloc(1);
+            void *ptr = malloc(1);
             free(ptr);
         }
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        currentTime = end.tv_sec - start.tv_sec;
+        timesA[workload] = currentTime;
         printf("Done Part A.)\n");
-        
+
         /**
          part B.)
          malloc() 1 byte, store the pointer in an array - do this 150 times.
@@ -90,8 +108,9 @@ int main(int argc, const char *argv[]) {
          */
         printf("Part B.) Malloc 1 byte, store the pointer in an array, 150 times.\nAfter 50 times, free 50 1 by 1.\n");
         int b;
-        void* partB[50];
+        void *partB[50];
         int partBCounter = 0;
+        clock_gettime(CLOCK_MONOTONIC, &start);
         for (b = 0; b < 150; b++) {
             partB[partBCounter++] = malloc(1);
             if (partBCounter == 50) {
@@ -103,14 +122,15 @@ int main(int argc, const char *argv[]) {
                 partBCounter = 0;
             }
         }
-        
-        
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        currentTime = end.tv_sec - start.tv_sec;
+        timesB[workload] = currentTime;
         printf("Done Part B.)\n");
-        
+
         // get random number seeded based on time
         // only do this once for the entire program
         srand((unsigned)time(0));
-        
+
         /**
          part C.)
          Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer > do this until you have allocated 50 times
@@ -121,16 +141,16 @@ int main(int argc, const char *argv[]) {
          > don't allow a free() if you have no pointers to free()
          */
         printf("Part C.) Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer until 50 bytes have been allocated.\n");
-        
+
         int partCAllocated = 0;
         int partCCount = 0;
-        
-        void* partC[50];
-        
+
+        void *partC[50];
+
         // rand() % 2 can equal 0 or 1 randomly
         // if 1 then allocate 1
         // if 0 then free 1
-        
+        clock_gettime(CLOCK_MONOTONIC, &start);
         while (partCCount < 50) {
             if (rand() % 2) {
                 partC[partCAllocated++] = malloc(1);
@@ -142,39 +162,40 @@ int main(int argc, const char *argv[]) {
                 }
             }
         }
-        
+
         // then free rest
-        
+
         int c;
-        
+
         for (c = 0; c < partCAllocated; c++) {
             free(partC[c]);
         }
-        
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        currentTime = end.tv_sec - start.tv_sec;
+        timesC[workload] = currentTime;
         printf("Done Part C.)\n");
-        
+
         /**
          part D.)
          Randomly choose between a randomly-sized malloc() or free()ing a pointer – do this many times (see below)
          - Keep track of each malloc so that all mallocs do not exceed your total memory capacity - Keep track of each operation so that you eventually malloc() 50 times
          - Keep track of each operation so that you eventually free() all pointers
          - Choose a random allocation size between 1 and 64 bytes
-         
+
          */
-        
+
         printf("Part D.) Randomly choose between a randomly-sized malloc() or free()ing a pointer.\n");
-        
-        void* partD[50];
-        
+
+        void *partD[50];
+
         int partDAllocated = 0;
         int partDCount = 0;
-        
+        clock_gettime(CLOCK_MONOTONIC, &start);
         while (partDCount < 50) {
-            
             if (rand() % 2) {
                 // rand() % 64 + 1
                 // generate a random number between 1 and 64
-                void* temp = malloc(rand() % 64 + 1);
+                void *temp = malloc(rand() % 64 + 1);
                 if (temp != NULL) {
                     partD[partDAllocated++] = temp;
                     partDCount++;
@@ -184,32 +205,34 @@ int main(int argc, const char *argv[]) {
                     free(partD[--partDAllocated]);
                 }
             }
-            
         }
-        
+
         // then free rest
-        
+
         int d;
-        
+
         for (d = 0; d < partDAllocated; d++) {
             free(partD[d]);
         }
-        
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        currentTime = end.tv_sec - start.tv_sec;
+        timesD[workload] = currentTime;
         printf("Done Part D.)\n");
-        
+
         /**
          part E.)
-         
+
          */
-        
+
         /**
          part F.)
-         
+
          */
-
-
-    
     }
-    
+    printf("Average run time for A = %lf\n", averageTime(timesA));
+    printf("Average run time for B = %lf\n", averageTime(timesB));
+    printf("Average run time for C = %lf\n", averageTime(timesC));
+    printf("Average run time for D = %lf\n", averageTime(timesD));
+
     return 0;
 }
