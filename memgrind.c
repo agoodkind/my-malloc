@@ -20,17 +20,15 @@
 
 double averageTime(unsigned long long times[]) {
     int i;
-    double sumOfTimes = 0;
+    unsigned long long sumOfTimes = 0;
     for (i = 0; i < 100; i++) {
         sumOfTimes += times[i];
     }
-    return (double)sumOfTimes / 100.0;
+    return (double)(sumOfTimes) / (double) 100.0;
 }
 
 int main(int argc, const char *argv[]) {
 #if DEBUG
-
-    //printf("%X", (unsigned int)((node*)myblock)->next);
 
     char *testCharArrayFive = (char *)malloc(5 * sizeof(char));
 
@@ -79,10 +77,13 @@ int main(int argc, const char *argv[]) {
     unsigned long long timesB[100];
     unsigned long long timesC[100];
     unsigned long long timesD[100];
-    unsigned long long currentTime;
-    struct timespec start, end;
+    unsigned long long timesE[100];
+    unsigned long long timesF[100];
+    
     //int time;
     for (workload = 0; workload < 100; workload++) {
+        struct timespec start, end;
+        
         printf("Running workload #%d: \n", workload + 1);
 
         /**
@@ -97,8 +98,7 @@ int main(int argc, const char *argv[]) {
             free(ptr);
         }
         clock_gettime(CLOCK_MONOTONIC, &end);
-        currentTime = end.tv_sec - start.tv_sec;
-        timesA[workload] = currentTime;
+        timesA[workload] = end.tv_nsec - start.tv_nsec;
         printf("Done Part A.)\n");
 
         /**
@@ -123,8 +123,8 @@ int main(int argc, const char *argv[]) {
             }
         }
         clock_gettime(CLOCK_MONOTONIC, &end);
-        currentTime = end.tv_sec - start.tv_sec;
-        timesB[workload] = currentTime;
+        
+        timesB[workload] = end.tv_nsec - start.tv_nsec;
         printf("Done Part B.)\n");
 
         // get random number seeded based on time
@@ -171,8 +171,7 @@ int main(int argc, const char *argv[]) {
             free(partC[c]);
         }
         clock_gettime(CLOCK_MONOTONIC, &end);
-        currentTime = end.tv_sec - start.tv_sec;
-        timesC[workload] = currentTime;
+        timesC[workload] = end.tv_nsec - start.tv_nsec;
         printf("Done Part C.)\n");
 
         /**
@@ -215,24 +214,33 @@ int main(int argc, const char *argv[]) {
             free(partD[d]);
         }
         clock_gettime(CLOCK_MONOTONIC, &end);
-        currentTime = end.tv_sec - start.tv_sec;
-        timesD[workload] = currentTime;
+        timesD[workload] = end.tv_nsec - start.tv_nsec;
         printf("Done Part D.)\n");
 
         /**
          part E.)
 
          */
+        
+        clock_gettime(CLOCK_MONOTONIC, &start);
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        timesD[workload] = end.tv_nsec - start.tv_nsec;
 
         /**
          part F.)
 
          */
+        
+        clock_gettime(CLOCK_MONOTONIC, &start);
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        timesF[workload] = end.tv_nsec - start.tv_nsec;
     }
-    printf("Average run time for A = %lf\n", averageTime(timesA));
-    printf("Average run time for B = %lf\n", averageTime(timesB));
-    printf("Average run time for C = %lf\n", averageTime(timesC));
-    printf("Average run time for D = %lf\n", averageTime(timesD));
+    printf("Average run time for A = %g ns\n", averageTime(timesA));
+    printf("Average run time for B = %g ns\n", averageTime(timesB));
+    printf("Average run time for C = %g ns\n", averageTime(timesC));
+    printf("Average run time for D = %g ns\n", averageTime(timesD));
+    printf("Average run time for E = %g ns\n", averageTime(timesE));
+    printf("Average run time for F = %g ns\n", averageTime(timesF));
 
     return 0;
 }
