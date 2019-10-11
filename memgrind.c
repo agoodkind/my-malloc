@@ -19,7 +19,7 @@
 #include "mymalloc.h"
 
 /**
- calculate the arithmetic mean (average) of a given array 
+ calculate the arithmetic mean (average) of a given array
  */
 double averageTime(unsigned long long times[]) {
     int i;
@@ -242,9 +242,10 @@ int main(int argc, const char *argv[]) {
     for (workload = 0; workload < 100; workload++) {
         struct timespec start, end;
 
-
-
         clock_gettime(CLOCK_MONOTONIC, &start);
+        
+        // add E test case here
+        
         clock_gettime(CLOCK_MONOTONIC, &end);
         timesD[workload] = end.tv_nsec - start.tv_nsec;
     }
@@ -257,9 +258,10 @@ int main(int argc, const char *argv[]) {
     for (workload = 0; workload < 100; workload++) {
         struct timespec start, end;
 
-
-
         clock_gettime(CLOCK_MONOTONIC, &start);
+        
+        // add F test case here
+        
         clock_gettime(CLOCK_MONOTONIC, &end);
         timesF[workload] = end.tv_nsec - start.tv_nsec;
     }
