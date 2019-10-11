@@ -24,7 +24,7 @@ double averageTime(unsigned long long times[]) {
     for (i = 0; i < 100; i++) {
         sumOfTimes += times[i];
     }
-    return (double)(sumOfTimes) / (double) 100.0;
+    return (double)(sumOfTimes) / (double)100.0;
 }
 
 int main(int argc, const char *argv[]) {
@@ -62,13 +62,18 @@ int main(int argc, const char *argv[]) {
     free(character);
     printf("this is character = %c\n", *character);
 
-    struct timespec testStart, testEnd;
+    struct timespec testStart, testEnd, testStart1, testEnd1;
 
     clock_gettime(CLOCK_MONOTONIC, &testStart);
     sleep(1);
     clock_gettime(CLOCK_MONOTONIC, &testEnd);
 
-    printf("%ld, %ld, %ld\n", testStart.tv_sec, testEnd.tv_sec, testEnd.tv_sec - testStart.tv_sec);
+    clock_gettime(CLOCK_REALTIME, &testStart1);
+    sleep(1);
+    clock_gettime(CLOCK_REALTIME, &testEnd1);
+
+    printf("%ld, %ld, %ld, %ld, %ld, %ld\n", testStart.tv_nsec, testEnd.tv_nsec, testEnd.tv_nsec - testStart.tv_nsec, testStart.tv_sec, testEnd.tv_sec, testEnd.tv_sec - testStart.tv_sec);
+    printf("%ld, %ld, %ld, %ld, %ld, %ld\n", testStart1.tv_nsec, testEnd1.tv_nsec, testEnd1.tv_nsec - testStart1.tv_nsec, testStart1.tv_sec, testEnd1.tv_sec, testEnd1.tv_sec - testStart1.tv_sec);
 
 #endif
 
@@ -79,18 +84,15 @@ int main(int argc, const char *argv[]) {
     unsigned long long timesD[100];
     unsigned long long timesE[100];
     unsigned long long timesF[100];
-    
-    //int time;
+
+    /**
+            part A.)
+            malloc() 1 byte and immediately free it - do this 150 times
+            */
+    printf("Part A.) Malloc and freeing 1 byte, 150 times.\n...\n");
     for (workload = 0; workload < 100; workload++) {
         struct timespec start, end;
-        
-        printf("Running workload #%d: \n", workload + 1);
 
-        /**
-         part A.)
-         malloc() 1 byte and immediately free it - do this 150 times
-         */
-        printf("Part A.) Malloc and freeing 1 byte, 150 times.\n");
         int a;
         clock_gettime(CLOCK_MONOTONIC, &start);
         for (a = 0; a < 150; a++) {
@@ -99,14 +101,19 @@ int main(int argc, const char *argv[]) {
         }
         clock_gettime(CLOCK_MONOTONIC, &end);
         timesA[workload] = end.tv_nsec - start.tv_nsec;
-        printf("Done Part A.)\n");
+    }
+    printf("Done Part A.)\n");
 
-        /**
-         part B.)
-         malloc() 1 byte, store the pointer in an array - do this 150 times.
-         Once you've malloc()ed 50 byte chunks, then free() the 50 1 byte pointers one by one.
-         */
-        printf("Part B.) Malloc 1 byte, store the pointer in an array, 150 times.\nAfter 50 times, free 50 1 by 1.\n");
+    /**
+     part B.)
+     malloc() 1 byte, store the pointer in an array - do this 150 times.
+     Once you've malloc()ed 50 byte chunks, then free() the 50 1 byte pointers one by one.
+     */
+    printf("Part B.) Malloc 1 byte, store the pointer in an array, 150 times.\nAfter 50 times, free 50 1 by 1.\n...\n");
+
+    for (workload = 0; workload < 100; workload++) {
+        struct timespec start, end;
+
         int b;
         void *partB[50];
         int partBCounter = 0;
@@ -123,24 +130,29 @@ int main(int argc, const char *argv[]) {
             }
         }
         clock_gettime(CLOCK_MONOTONIC, &end);
-        
+
         timesB[workload] = end.tv_nsec - start.tv_nsec;
-        printf("Done Part B.)\n");
+    }
 
-        // get random number seeded based on time
-        // only do this once for the entire program
-        srand((unsigned)time(0));
+    printf("Done Part B.)\n");
 
-        /**
-         part C.)
-         Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer > do this until you have allocated 50 times
-         - Keep track of each operation so that you eventually malloc() 50 bytes, in total
-         > if you have already allocated 50 times, disregard the random and just free() on each
-         iteration
-         - Keep track of each operation so that you eventually free() all pointers
-         > don't allow a free() if you have no pointers to free()
-         */
-        printf("Part C.) Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer until 50 bytes have been allocated.\n");
+    // get random number seeded based on time
+    // only do this once for the entire program
+    srand((unsigned)time(0));
+
+    /**
+     part C.)
+     Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer > do this until you have allocated 50 times
+     - Keep track of each operation so that you eventually malloc() 50 bytes, in total
+     > if you have already allocated 50 times, disregard the random and just free() on each
+     iteration
+     - Keep track of each operation so that you eventually free() all pointers
+     > don't allow a free() if you have no pointers to free()
+     */
+    printf("Part C.) Randomly choose between a 1 byte malloc() or free()ing a 1 byte pointer until 50 bytes have been allocated.\n...\n");
+
+    for (workload = 0; workload < 100; workload++) {
+        struct timespec start, end;
 
         int partCAllocated = 0;
         int partCCount = 0;
@@ -172,18 +184,19 @@ int main(int argc, const char *argv[]) {
         }
         clock_gettime(CLOCK_MONOTONIC, &end);
         timesC[workload] = end.tv_nsec - start.tv_nsec;
-        printf("Done Part C.)\n");
+    }
+    printf("Done Part C.)\n");
 
-        /**
-         part D.)
-         Randomly choose between a randomly-sized malloc() or free()ing a pointer – do this many times (see below)
-         - Keep track of each malloc so that all mallocs do not exceed your total memory capacity - Keep track of each operation so that you eventually malloc() 50 times
-         - Keep track of each operation so that you eventually free() all pointers
-         - Choose a random allocation size between 1 and 64 bytes
-
-         */
-
-        printf("Part D.) Randomly choose between a randomly-sized malloc() or free()ing a pointer.\n");
+    /**
+     part D.)
+     Randomly choose between a randomly-sized malloc() or free()ing a pointer – do this many times (see below)
+     - Keep track of each malloc so that all mallocs do not exceed your total memory capacity - Keep track of each operation so that you eventually malloc() 50 times
+     - Keep track of each operation so that you eventually free() all pointers
+     - Choose a random allocation size between 1 and 64 bytes
+     */
+    printf("Part D.) Randomly choose between a randomly-sized malloc() or free()ing a pointer.\n...\n");
+    for (workload = 0; workload < 100; workload++) {
+        struct timespec start, end;
 
         void *partD[50];
 
@@ -215,22 +228,34 @@ int main(int argc, const char *argv[]) {
         }
         clock_gettime(CLOCK_MONOTONIC, &end);
         timesD[workload] = end.tv_nsec - start.tv_nsec;
-        printf("Done Part D.)\n");
+    }
+    printf("Done Part D.)\n");
+    
+    /**
+     part E.)
 
-        /**
-         part E.)
+     */
+    
+    for (workload = 0; workload < 100; workload++) {
+        struct timespec start, end;
 
-         */
-        
+
+
         clock_gettime(CLOCK_MONOTONIC, &start);
         clock_gettime(CLOCK_MONOTONIC, &end);
         timesD[workload] = end.tv_nsec - start.tv_nsec;
+    }
+    
+    /**
+     part F.)
 
-        /**
-         part F.)
+     */
+    
+    for (workload = 0; workload < 100; workload++) {
+        struct timespec start, end;
 
-         */
-        
+
+
         clock_gettime(CLOCK_MONOTONIC, &start);
         clock_gettime(CLOCK_MONOTONIC, &end);
         timesF[workload] = end.tv_nsec - start.tv_nsec;
