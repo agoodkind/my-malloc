@@ -18,6 +18,9 @@
 
 #include "mymalloc.h"
 
+/**
+ calculate the arithmetic mean (average) of a given array 
+ */
 double averageTime(unsigned long long times[]) {
     int i;
     unsigned long long sumOfTimes = 0;
