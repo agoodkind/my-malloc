@@ -92,11 +92,16 @@ void combineFreeBlocks() {
 }
 
 /**
- TODO: add checking for pointer input
- we must assert that &myblock[0] <= (char*) address <= &myblock[HEAP_SIZE]
- or error out
+ this function takes in a void pointer and searches the memory block for the corresponding metadata node then marks it as not in use
+ it then calls combineFreeBlocks(); which combines all adjacent blocks that have been marked as not in use, such that the very first of the next n free blocks contains the sum of all their corresponding sizes
  */
 void myfree(void *address, char *file, int line) {
+    
+    // a NULL address is already free by definition
+    if (address == NULL) {
+        return;
+    }
+    
     char *currentPos = &myblock[0];
     char *userAddress =  (char *)(address - sizeof(node) - 1);
 
