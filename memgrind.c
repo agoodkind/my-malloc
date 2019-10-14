@@ -247,7 +247,7 @@ int main(int argc, const char *argv[]) {
         // add E test case here
         
         clock_gettime(CLOCK_MONOTONIC, &end);
-        timesD[workload] = end.tv_nsec - start.tv_nsec;
+        timesE[workload] = end.tv_nsec - start.tv_nsec;
     }
     
     /**
