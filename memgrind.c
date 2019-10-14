@@ -8,13 +8,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
-#include <assert.h>
-#include <sys/types.h>
 #include <time.h>
-#include <sys/time.h>
-#include <errno.h>
 
 #include "mymalloc.h"
 
@@ -233,44 +228,87 @@ int main(int argc, const char *argv[]) {
         timesD[workload] = end.tv_nsec - start.tv_nsec;
     }
     printf("Done Part D.)\n");
-    
+
     /**
      part E.)
-
+     saturate the heap with 1 byte allocations, then free it completely
      */
-    
+    printf("Part E.) Saturate the heap with 1 byte allocations, then free it completely.\n...\n");
     for (workload = 0; workload < 100; workload++) {
         struct timespec start, end;
 
         clock_gettime(CLOCK_MONOTONIC, &start);
-        
-        // add E test case here
-        
+
+        int i;
+
+        //instantiate an array which accounts for metadata overhead
+#define PARTE_ARR_SIZE 406
+        void *arrayE[PARTE_ARR_SIZE];
+
+        //malloc until we saturate memory
+        for (i = 0; i < PARTE_ARR_SIZE; i++) {
+            arrayE[i] = malloc(1);
+        }
+        //free everything
+        for (i = 0; i < PARTE_ARR_SIZE; i++) {
+            free(arrayE[i]);
+        }
+
         clock_gettime(CLOCK_MONOTONIC, &end);
         timesE[workload] = end.tv_nsec - start.tv_nsec;
     }
-    
+    printf("Done Part E.)\n");
+
     /**
      part F.)
-
+    saturate the heap then free 64 bytes, followed by allocating a random byte sized between 1 and 64 and immediately freeing it
      */
-    
+    printf("Part F.) Saturate the heap with 1 byte allocations, then allocate a random byte sized between 1 and 64 and immediately freeing it.\n...\n");
     for (workload = 0; workload < 100; workload++) {
         struct timespec start, end;
 
         clock_gettime(CLOCK_MONOTONIC, &start);
+
+        int i;
+        //instantiate array that accounts for metadata overhead
+#define PARTF_ARR_SIZE 406
+        void *arrayF[PARTF_ARR_SIZE];
+        clock_gettime(CLOCK_MONOTONIC, &start);
         
-        // add F test case here
+        //saturate memory
+        for (i = 0; i < PARTF_ARR_SIZE; i++) {
+            arrayF[i] = malloc(1);
+        }
         
+        //free 64 bytes of memory
+        for (i = 0; i < 64; i++) {
+            free(arrayF[i]);
+        }
+        //malloc a pointer of a random size from 1 to 64 and immediately free it
+        for (i = 0; i < 50; i++) {
+            void *temp = malloc(rand() % 64 + 1);
+            free(temp);
+        }
+        
+        //free rest of memory
+        for (i = 64; i < PARTF_ARR_SIZE; i++) {
+            free(arrayF[i]);
+        }
+
         clock_gettime(CLOCK_MONOTONIC, &end);
         timesF[workload] = end.tv_nsec - start.tv_nsec;
     }
+    printf("Done Part F.)\n");
+    
+    /**
+     print averages:
+     */
     printf("Average run time for A = %g ns\n", averageTime(timesA));
     printf("Average run time for B = %g ns\n", averageTime(timesB));
     printf("Average run time for C = %g ns\n", averageTime(timesC));
     printf("Average run time for D = %g ns\n", averageTime(timesD));
-    printf("Average run time for E = %g ns\n", averageTime(timesE));
-    printf("Average run time for F = %g ns\n", averageTime(timesF));
+    printf("Average run time for E = %0.f ns\n", averageTime(timesE));
+    printf("Average run time for F = %0.f ns\n", averageTime(timesF));
 
     return 0;
 }
