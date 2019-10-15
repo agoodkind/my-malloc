@@ -1,5 +1,4 @@
 # Asst1: ++Malloc
-readme.pdf
 
 Rutgers CS 01:198:214 Systems Programming
 
