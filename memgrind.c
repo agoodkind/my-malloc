@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <unistd.h>
 #include <time.h>
 
@@ -16,19 +17,25 @@
 /**
  calculate the arithmetic mean (average) of a given array
  */
-double averageTime(unsigned long long times[]) {
+double averageTime(unsigned long times[]) {
     int i;
-    unsigned long long sumOfTimes = 0;
+    unsigned long sumOfTimes;
+    sumOfTimes = 0;
     for (i = 0; i < 100; i++) {
         sumOfTimes += times[i];
     }
     return (double)(sumOfTimes) / (double)100.0;
 }
 
-int main(int argc, const char *argv[]) {
 #if DEBUG
+void debug() {
+    char *testCharArrayFive;
+    int *testIntArraySeven;
+    long *testLongArrayTen;
+    char *character;
+    struct timespec testStart, testEnd, testStart1, testEnd1;
 
-    char *testCharArrayFive = (char *)malloc(5 * sizeof(char));
+    testCharArrayFive = (char *)malloc(5 * sizeof(char));
 
     testCharArrayFive[0] = 'h';
     testCharArrayFive[1] = 'e';
@@ -36,14 +43,14 @@ int main(int argc, const char *argv[]) {
     testCharArrayFive[3] = 'l';
     testCharArrayFive[4] = '\0';
 
-    int *testIntArraySeven = (int *)malloc(7 * sizeof(int));
+    testIntArraySeven = (int *)malloc(7 * sizeof(int));
 
     testIntArraySeven[0] = 1;
     testIntArraySeven[6] = 6969420;
 
     free(testCharArrayFive);
 
-    long *testLongArrayTen = (long *)malloc(10 * sizeof(long));
+    testLongArrayTen = (long *)malloc(10 * sizeof(long));
 
     testLongArrayTen[0] = 192319230913;
     testLongArrayTen[9] = 999999999999;
@@ -54,13 +61,11 @@ int main(int argc, const char *argv[]) {
 
     printf("test\n");
 
-    char *character = (char *)malloc(sizeof(char));
+    character = (char *)malloc(sizeof(char));
     *character = 'A';
     printf("this is character = %c\n", *character);
     free(character);
     printf("this is character = %c\n", *character);
-
-    struct timespec testStart, testEnd, testStart1, testEnd1;
 
     clock_gettime(CLOCK_MONOTONIC, &testStart);
     sleep(1);
@@ -72,21 +77,26 @@ int main(int argc, const char *argv[]) {
 
     printf("%ld, %ld, %ld, %ld, %ld, %ld\n", testStart.tv_nsec, testEnd.tv_nsec, testEnd.tv_nsec - testStart.tv_nsec, testStart.tv_sec, testEnd.tv_sec, testEnd.tv_sec - testStart.tv_sec);
     printf("%ld, %ld, %ld, %ld, %ld, %ld\n", testStart1.tv_nsec, testEnd1.tv_nsec, testEnd1.tv_nsec - testStart1.tv_nsec, testStart1.tv_sec, testEnd1.tv_sec, testEnd1.tv_sec - testStart1.tv_sec);
-
+}
 #endif
 
+int main(int argc, const char *argv[]) {
     int workload;
-    unsigned long long timesA[100];
-    unsigned long long timesB[100];
-    unsigned long long timesC[100];
-    unsigned long long timesD[100];
-    unsigned long long timesE[100];
-    unsigned long long timesF[100];
+    unsigned long timesA[100];
+    unsigned long timesB[100];
+    unsigned long timesC[100];
+    unsigned long timesD[100];
+    unsigned long timesE[100];
+    unsigned long timesF[100];
+
+    #if DEBUG
+    debug();
+    #endif
 
     /**
-            part A.)
-            malloc() 1 byte and immediately free it - do this 150 times
-            */
+    part A.)
+    malloc() 1 byte and immediately free it - do this 150 times
+    */
     printf("Part A.) Malloc and freeing 1 byte, 150 times.\n...\n");
     for (workload = 0; workload < 100; workload++) {
         struct timespec start, end;
@@ -134,8 +144,8 @@ int main(int argc, const char *argv[]) {
 
     printf("Done Part B.)\n");
 
-    // get random number seeded based on time
-    // only do this once for the entire program
+    /* get random number seeded based on time */
+    /* only do this once for the entire program */
     srand((unsigned)time(0));
 
     /**
@@ -157,25 +167,25 @@ int main(int argc, const char *argv[]) {
 
         void *partC[50];
 
-        // rand() % 2 can equal 0 or 1 randomly
-        // if 1 then allocate 1
-        // if 0 then free 1
+        int c;
+
+        /* rand() % 2 can equal 0 or 1 randomly
+        if 1 then allocate 1
+        if 0 then free 1 */
         clock_gettime(CLOCK_MONOTONIC, &start);
         while (partCCount < 50) {
             if (rand() % 2) {
                 partC[partCAllocated++] = malloc(1);
                 partCCount++;
             } else {
-                // check to make sure that there is at least 1 allocated
+                /* check to make sure that there is at least 1 allocated */
                 if (partCAllocated > 0) {
                     free(partC[--partCAllocated]);
                 }
             }
         }
 
-        // then free rest
-
-        int c;
+        /* then free rest */
 
         for (c = 0; c < partCAllocated; c++) {
             free(partC[c]);
@@ -200,6 +210,8 @@ int main(int argc, const char *argv[]) {
 
         int partDAllocated = 0;
         int partDCount = 0;
+        int d;
+
         clock_gettime(CLOCK_MONOTONIC, &start);
         while (partDCount < 50) {
             if (rand() % 2) {
@@ -219,8 +231,6 @@ int main(int argc, const char *argv[]) {
 
         // then free rest
 
-        int d;
-
         for (d = 0; d < partDAllocated; d++) {
             free(partD[d]);
         }
@@ -236,21 +246,20 @@ int main(int argc, const char *argv[]) {
     printf("Part E.) Saturate the heap with 1 byte allocations, then free it completely.\n...\n");
     for (workload = 0; workload < 100; workload++) {
         struct timespec start, end;
+        int i;
+        #define PARTEF_ARR_SIZE 406
+        void *arrayE[PARTEF_ARR_SIZE];
 
         clock_gettime(CLOCK_MONOTONIC, &start);
 
-        int i;
-
         //instantiate an array which accounts for metadata overhead
-#define PARTE_ARR_SIZE 406
-        void *arrayE[PARTE_ARR_SIZE];
 
         //malloc until we saturate memory
-        for (i = 0; i < PARTE_ARR_SIZE; i++) {
+        for (i = 0; i < PARTEF_ARR_SIZE; i++) {
             arrayE[i] = malloc(1);
         }
         //free everything
-        for (i = 0; i < PARTE_ARR_SIZE; i++) {
+        for (i = 0; i < PARTEF_ARR_SIZE; i++) {
             free(arrayE[i]);
         }
 
@@ -266,20 +275,17 @@ int main(int argc, const char *argv[]) {
     printf("Part F.) Saturate the heap with 1 byte allocations, then allocate a random byte sized between 1 and 64 and immediately freeing it.\n...\n");
     for (workload = 0; workload < 100; workload++) {
         struct timespec start, end;
-
-        clock_gettime(CLOCK_MONOTONIC, &start);
-
         int i;
-        //instantiate array that accounts for metadata overhead
-#define PARTF_ARR_SIZE 406
-        void *arrayF[PARTF_ARR_SIZE];
+        #define PARTEF_ARR_SIZE 406
+        void *arrayF[PARTEF_ARR_SIZE];
+
         clock_gettime(CLOCK_MONOTONIC, &start);
-        
+
         //saturate memory
-        for (i = 0; i < PARTF_ARR_SIZE; i++) {
+        for (i = 0; i < PARTEF_ARR_SIZE; i++) {
             arrayF[i] = malloc(1);
         }
-        
+
         //free 64 bytes of memory
         for (i = 0; i < 64; i++) {
             free(arrayF[i]);
@@ -289,9 +295,9 @@ int main(int argc, const char *argv[]) {
             void *temp = malloc(rand() % 64 + 1);
             free(temp);
         }
-        
+
         //free rest of memory
-        for (i = 64; i < PARTF_ARR_SIZE; i++) {
+        for (i = 64; i < PARTEF_ARR_SIZE; i++) {
             free(arrayF[i]);
         }
 
@@ -299,14 +305,14 @@ int main(int argc, const char *argv[]) {
         timesF[workload] = end.tv_nsec - start.tv_nsec;
     }
     printf("Done Part F.)\n");
-    
+
     /**
      print averages:
      */
-    printf("Average run time for A = %g ns\n", averageTime(timesA));
-    printf("Average run time for B = %g ns\n", averageTime(timesB));
-    printf("Average run time for C = %g ns\n", averageTime(timesC));
-    printf("Average run time for D = %g ns\n", averageTime(timesD));
+    printf("Average run time for A = %0.f ns\n", averageTime(timesA));
+    printf("Average run time for B = %0.f ns\n", averageTime(timesB));
+    printf("Average run time for C = %0.f ns\n", averageTime(timesC));
+    printf("Average run time for D = %0.f ns\n", averageTime(timesD));
     printf("Average run time for E = %0.f ns\n", averageTime(timesE));
     printf("Average run time for F = %0.f ns\n", averageTime(timesF));
 

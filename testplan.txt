@@ -1,0 +1,20 @@
+testplan.txt
+Rutgers CS 01:198:214 Systems Programming
+Professor John-Austen Francisco
+Authors: Anthony Siluk & Alexander Goodkind
+Due: 10/15/2019
+
+When tasked with crafting our own final testcases for our memgrind.c file, we decided to consider the possibility of saturating the memory. 
+This is the process of malloc()ing all available bytes in our “heap” and seeing what happens. 
+
+Test case E is simply just this, mallocing 1 byte and storing it in an array to be freed afterwards. 
+The list size is 406 in both E and F due to calculated metadata overhead, any larger risked a segmentation fault. 
+
+Test Case F builds on top of this by first saturating the memory, and then freeing 64 bytes.
+
+After this, we malloc a random sized pointer between 1 and 64 bytes in size and then immediately free it 50 times. 
+
+This was done to observe what would occur after saturating the memory, freeing just enough for a large sized pointer, and then continuing to malloc() and free() numerous times. 
+The remaining 342 pointers were freed at the end. 
+ 
+The average times for both case E and case F are also far larger than those of the previous 4, which is to be expected due to the large amount of malloc() and free() calls occurring over 100 times in each case. 
