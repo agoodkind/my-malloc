@@ -1,10 +1,10 @@
-//
-//  memgrind.c - mymalloc tester filer
-//  Rutgers CS 01:198:214 Systems Programming
-//  Professor John-Austen Francisco
-//  Authors: Anthony Siluk & Alexander Goodkind
-//  Due: 10/15/2019
-//
+/**
+  memgrind.c - mymalloc tester filer
+  Rutgers CS 01:198:214 Systems Programming
+  Professor John-Austen Francisco
+  Authors: Anthony Siluk & Alexander Goodkind
+  Due: 10/15/2019
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,70 +28,25 @@ double averageTime(unsigned long times[]) {
 }
 
 #if DEBUG
-void debug() {
-    char *testCharArrayFive;
-    int *testIntArraySeven;
-    long *testLongArrayTen;
-    char *character;
-    struct timespec testStart, testEnd, testStart1, testEnd1;
-
-    testCharArrayFive = (char *)malloc(5 * sizeof(char));
-
-    testCharArrayFive[0] = 'h';
-    testCharArrayFive[1] = 'e';
-    testCharArrayFive[2] = 'l';
-    testCharArrayFive[3] = 'l';
-    testCharArrayFive[4] = '\0';
-
-    testIntArraySeven = (int *)malloc(7 * sizeof(int));
-
-    testIntArraySeven[0] = 1;
-    testIntArraySeven[6] = 6969420;
-
-    free(testCharArrayFive);
-
-    testLongArrayTen = (long *)malloc(10 * sizeof(long));
-
-    testLongArrayTen[0] = 192319230913;
-    testLongArrayTen[9] = 999999999999;
-
-    free(testIntArraySeven);
-
-    free(testLongArrayTen);
-
-    printf("test\n");
-
-    character = (char *)malloc(sizeof(char));
-    *character = 'A';
-    printf("this is character = %c\n", *character);
-    free(character);
-    printf("this is character = %c\n", *character);
-
-    clock_gettime(CLOCK_MONOTONIC, &testStart);
-    sleep(1);
-    clock_gettime(CLOCK_MONOTONIC, &testEnd);
-
-    clock_gettime(CLOCK_REALTIME, &testStart1);
-    sleep(1);
-    clock_gettime(CLOCK_REALTIME, &testEnd1);
-
-    printf("%ld, %ld, %ld, %ld, %ld, %ld\n", testStart.tv_nsec, testEnd.tv_nsec, testEnd.tv_nsec - testStart.tv_nsec, testStart.tv_sec, testEnd.tv_sec, testEnd.tv_sec - testStart.tv_sec);
-    printf("%ld, %ld, %ld, %ld, %ld, %ld\n", testStart1.tv_nsec, testEnd1.tv_nsec, testEnd1.tv_nsec - testStart1.tv_nsec, testStart1.tv_sec, testEnd1.tv_sec, testEnd1.tv_sec - testStart1.tv_sec);
-}
+void debug(void);
 #endif
+
 
 int main(int argc, const char *argv[]) {
     int workload;
-    unsigned long timesA[100];
-    unsigned long timesB[100];
-    unsigned long timesC[100];
-    unsigned long timesD[100];
-    unsigned long timesE[100];
-    unsigned long timesF[100];
+    /*
+     we used volatile types because we don't want the compiler to optimize our code since we want to actually see how long it takes to malloc & free
+     */
+    volatile unsigned long timesA[100];
+    volatile unsigned long timesB[100];
+    volatile unsigned long timesC[100];
+    volatile unsigned long timesD[100];
+    volatile unsigned long timesE[100];
+    volatile unsigned long timesF[100];
 
-    #if DEBUG
+#if DEBUG
     debug();
-    #endif
+#endif
 
     /**
     part A.)
@@ -123,7 +78,7 @@ int main(int argc, const char *argv[]) {
         struct timespec start, end;
 
         int b;
-        void *partB[50];
+        volatile void *partB[50];
         int partBCounter = 0;
         clock_gettime(CLOCK_MONOTONIC, &start);
         for (b = 0; b < 150; b++) {
@@ -131,7 +86,7 @@ int main(int argc, const char *argv[]) {
             if (partBCounter == 50) {
                 int b2;
                 for (b2 = 0; b2 < 50; b2++) {
-                    free(partB[b2]);
+                    free((void*)partB[b2]);
                     partB[b2] = NULL;
                 }
                 partBCounter = 0;
@@ -165,7 +120,7 @@ int main(int argc, const char *argv[]) {
         int partCAllocated = 0;
         int partCCount = 0;
 
-        void *partC[50];
+        volatile void *partC[50];
 
         int c;
 
@@ -180,7 +135,7 @@ int main(int argc, const char *argv[]) {
             } else {
                 /* check to make sure that there is at least 1 allocated */
                 if (partCAllocated > 0) {
-                    free(partC[--partCAllocated]);
+                    free((void*)partC[--partCAllocated]);
                 }
             }
         }
@@ -188,7 +143,7 @@ int main(int argc, const char *argv[]) {
         /* then free rest */
 
         for (c = 0; c < partCAllocated; c++) {
-            free(partC[c]);
+            free((void*)partC[c]);
         }
         clock_gettime(CLOCK_MONOTONIC, &end);
         timesC[workload] = end.tv_nsec - start.tv_nsec;
@@ -206,7 +161,7 @@ int main(int argc, const char *argv[]) {
     for (workload = 0; workload < 100; workload++) {
         struct timespec start, end;
 
-        void *partD[50];
+        volatile void *partD[50];
 
         int partDAllocated = 0;
         int partDCount = 0;
@@ -215,8 +170,7 @@ int main(int argc, const char *argv[]) {
         clock_gettime(CLOCK_MONOTONIC, &start);
         while (partDCount < 50) {
             if (rand() % 2) {
-                // rand() % 64 + 1
-                // generate a random number between 1 and 64
+                 /* rand() % 64 + 1 generate a random number between 1 and 64 */
                 void *temp = malloc(rand() % 64 + 1);
                 if (temp != NULL) {
                     partD[partDAllocated++] = temp;
@@ -224,21 +178,22 @@ int main(int argc, const char *argv[]) {
                 }
             } else {
                 if (partDAllocated > 0) {
-                    free(partD[--partDAllocated]);
+                    free((void*)partD[--partDAllocated]);
                 }
             }
         }
 
-        // then free rest
+        /* then free rest */
 
         for (d = 0; d < partDAllocated; d++) {
-            free(partD[d]);
+            free((void*)partD[d]);
         }
         clock_gettime(CLOCK_MONOTONIC, &end);
         timesD[workload] = end.tv_nsec - start.tv_nsec;
     }
     printf("Done Part D.)\n");
 
+#define PARTEF_ARR_SIZE 406
     /**
      part E.)
      saturate the heap with 1 byte allocations, then free it completely
@@ -247,20 +202,19 @@ int main(int argc, const char *argv[]) {
     for (workload = 0; workload < 100; workload++) {
         struct timespec start, end;
         int i;
-        #define PARTEF_ARR_SIZE 406
-        void *arrayE[PARTEF_ARR_SIZE];
+        
+        /* instantiate an array which accounts for metadata overhead */
+        volatile void *arrayE[PARTEF_ARR_SIZE];
 
         clock_gettime(CLOCK_MONOTONIC, &start);
 
-        //instantiate an array which accounts for metadata overhead
-
-        //malloc until we saturate memory
+        /* malloc until we saturate memory */
         for (i = 0; i < PARTEF_ARR_SIZE; i++) {
             arrayE[i] = malloc(1);
         }
-        //free everything
+        /* free everything */
         for (i = 0; i < PARTEF_ARR_SIZE; i++) {
-            free(arrayE[i]);
+            free((void*)arrayE[i]);
         }
 
         clock_gettime(CLOCK_MONOTONIC, &end);
@@ -276,29 +230,28 @@ int main(int argc, const char *argv[]) {
     for (workload = 0; workload < 100; workload++) {
         struct timespec start, end;
         int i;
-        #define PARTEF_ARR_SIZE 406
-        void *arrayF[PARTEF_ARR_SIZE];
+        volatile void *arrayF[PARTEF_ARR_SIZE];
 
         clock_gettime(CLOCK_MONOTONIC, &start);
 
-        //saturate memory
+        /* saturate memory */
         for (i = 0; i < PARTEF_ARR_SIZE; i++) {
             arrayF[i] = malloc(1);
         }
 
-        //free 64 bytes of memory
+        /* free 64 bytes of memory */
         for (i = 0; i < 64; i++) {
-            free(arrayF[i]);
+            free((void*)arrayF[i]);
         }
-        //malloc a pointer of a random size from 1 to 64 and immediately free it
+        /* malloc a pointer of a random size from 1 to 64 and immediately free it */
         for (i = 0; i < 50; i++) {
             void *temp = malloc(rand() % 64 + 1);
-            free(temp);
+            free((void*)temp);
         }
 
-        //free rest of memory
+        /* free rest of memory */
         for (i = 64; i < PARTEF_ARR_SIZE; i++) {
-            free(arrayF[i]);
+            free((void*)arrayF[i]);
         }
 
         clock_gettime(CLOCK_MONOTONIC, &end);
@@ -306,15 +259,69 @@ int main(int argc, const char *argv[]) {
     }
     printf("Done Part F.)\n");
 
-    /**
+    /*
      print averages:
      */
-    printf("Average run time for A = %0.f ns\n", averageTime(timesA));
-    printf("Average run time for B = %0.f ns\n", averageTime(timesB));
-    printf("Average run time for C = %0.f ns\n", averageTime(timesC));
-    printf("Average run time for D = %0.f ns\n", averageTime(timesD));
-    printf("Average run time for E = %0.f ns\n", averageTime(timesE));
-    printf("Average run time for F = %0.f ns\n", averageTime(timesF));
+    printf("Average run time for A = %0.f ns\n", averageTime((unsigned long *)timesA));
+    printf("Average run time for B = %0.f ns\n", averageTime((unsigned long *)timesB));
+    printf("Average run time for C = %0.f ns\n", averageTime((unsigned long *)timesC));
+    printf("Average run time for D = %0.f ns\n", averageTime((unsigned long *)timesD));
+    printf("Average run time for E = %0.f ns\n", averageTime((unsigned long *)timesE));
+    printf("Average run time for F = %0.f ns\n", averageTime((unsigned long *)timesF));
 
     return 0;
 }
+
+
+#if DEBUG
+void debug() {
+    volatile char *testCharArrayFive;
+    volatile int *testIntArraySeven;
+    volatile long *testLongArrayTen;
+    volatile char *character;
+    struct timespec testStart, testEnd, testStart1, testEnd1;
+
+    testCharArrayFive = (char *)malloc(5 * sizeof(char));
+
+    testCharArrayFive[0] = 'h';
+    testCharArrayFive[1] = 'e';
+    testCharArrayFive[2] = 'l';
+    testCharArrayFive[3] = 'l';
+    testCharArrayFive[4] = '\0';
+
+    testIntArraySeven = (int *)malloc(7 * sizeof(int));
+
+    testIntArraySeven[0] = 1;
+    testIntArraySeven[6] = 6969420;
+
+    free((void*)testCharArrayFive);
+
+    testLongArrayTen = (long *)malloc(10 * sizeof(long));
+
+    testLongArrayTen[0] = 192319230913;
+    testLongArrayTen[9] = 999999999999;
+
+    free((void*)testIntArraySeven);
+
+    free((void*)testLongArrayTen);
+
+    printf("test\n");
+
+    character = (char *)malloc(sizeof(char));
+    *character = 'A';
+    printf("this is character = %c\n", *character);
+    free((void*)character);
+    printf("this is character = %c\n", *character);
+
+    clock_gettime(CLOCK_MONOTONIC, &testStart);
+    sleep(1);
+    clock_gettime(CLOCK_MONOTONIC, &testEnd);
+
+    clock_gettime(CLOCK_REALTIME, &testStart1);
+    sleep(1);
+    clock_gettime(CLOCK_REALTIME, &testEnd1);
+
+    printf("%ld, %ld, %ld, %ld, %ld, %ld\n", testStart.tv_nsec, testEnd.tv_nsec, testEnd.tv_nsec - testStart.tv_nsec, testStart.tv_sec, testEnd.tv_sec, testEnd.tv_sec - testStart.tv_sec);
+    printf("%ld, %ld, %ld, %ld, %ld, %ld\n", testStart1.tv_nsec, testEnd1.tv_nsec, testEnd1.tv_nsec - testStart1.tv_nsec, testStart1.tv_sec, testEnd1.tv_sec, testEnd1.tv_sec - testStart1.tv_sec);
+}
+#endif

@@ -21,25 +21,39 @@ we decided that we do not need to have a next pointer as we can always calculate
 
 - Our `getNext(char*)`  function looks at a given node address and performs returns the result from a.)
 - Our myfree looks at the given user address and converts it using b.)
+
+**note for grading:** with our assumptions about heap size, we were able to produce a metadata with `sizeof(node)` = **4 bytes** *[assuming you are running on the x64 ilab machines with* `*gcc -O0 -std=gnu89*` *and with* `*gcc -v*`*: gcc version 4.8.5 20150623 (Red Hat 4.8.5-36) (GCC)]*
+
     
 # mymalloc:
 
 there are two main functions that mymalloc has, and each function uses two helper functions to perform the tasks of classic `malloc()` and `free()`
 
 1. `void * mymalloc(size_t size, char *file, int line)`
-
-when mymalloc is first called with a given size, it will first check if anything has been allocated yet to the array, it does this by checking the flag: `heapUninitialized`, which by default is true. mymalloc will mark the very first block as `inUse` and set it’s size to `HEAP_SIZE - sizeof(node) - 1`.
-
-    1. `char * findOpenNode(size_t size)`
-    findOpenNode will traverse uses `getNext()` until it finds a node with a.) enough space b.) not inUse.
-    1. `void * splitBlock(char *current, size_t size)`
-    once an open node is found we call splitBlock where it will take the given node & allocate ONLY what space is needed, and then directly after will assign a new node that is not inUse with the remaining data.
-2. `void myfree(void *address, char *file, int line)`
-    given a user pointer we find the corresponding node pointer (see above) then we call:
-    1. `void combineFreeBlocks()`.
-    this will run any time a pointer is free, when it is called it will traverse the entire array and look for directly adjacent blocks, the first free block in a series of 2 or more free blocks has its blockSize changed to an accumulation of the following adjacent blocks.
-    Running this every time we free we can guarantee that we'll always have proper metadata stored and are able to find the next inUse block.
+    1. when mymalloc is first called with a given size, it will first check if anything has been allocated yet to the array, it does this by checking the flag: `heapUninitialized`, which by default is true. 
+    2. mymalloc will mark the very first block as `inUse` and set it’s size to `HEAP_SIZE - sizeof(node) - 1`.
+2. `char * findOpenNode(size_t size)`
+    1. findOpenNode will traverse uses `getNext()` until it finds a node with a.) enough space b.) not inUse.
+3. `void * splitBlock(char *current, size_t size)`
+    1. once an open node is found we call splitBlock where it will take the given node & allocate ONLY what space is needed, and then directly after will assign a new node that is not inUse with the remaining data.
+4. `void myfree(void *address, char *file, int line)`
+    1. given a user pointer we find the corresponding node pointer (see above) then we call:
+5. `void combineFreeBlocks()`.
+    1. this will run any time a pointer is free, when it is called it will traverse the entire array and look for directly adjacent blocks, the first free block in a series of 2 or more free blocks has its blockSize changed to an accumulation of the following adjacent blocks.
+    2. Running this every time we free we can guarantee that we'll always have proper metadata stored and are able to find the next inUse block.
     
+## Error Handling:
+1. When calling mymalloc, we check if the requested `size_t`  will *even* fit on our heap: by doing `size > HEAP_SIZE-sizeof(node)-1` 
+    1. in the case there isn’t we print an out of memory error and `return NULL`
+2. Next when mymalloc calls `findOpenNode` we traverse until we find an open node that has a large enough size
+    1. in the case we print an out of memory error and `return NULL`
+3. When calling myfree, we first check that the user address is not NULL
+    1. if it is just silently return without printing an error
+4. Next, myfree checks if the address itself is within the actual array by doing `myblock + sizeof(node) + 1 > (char*) address || (char*) address > &myblock[HEAP_SIZE] - sizeof(node) - 1`
+    1. if it isn’t we print that the address is invalid and out of range, then we return
+5. myfree then checks if the corresponding node address matches one in the heap
+    1. if it does we then check if the address is already marked as free, we return an error if it has
+    2. if it doesn’t we return that the address hasn’t been allocated yet
 # memgrind:
 
 We run 6 tests, 2 of which are custom made:
